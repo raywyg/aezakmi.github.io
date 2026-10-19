@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>aezakmi — visual & motion</title>
-  <!-- Подключаем стильные шрифты: Syne для никнейма и JetBrains Mono для кибер-телеметрии -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
@@ -28,23 +27,37 @@
       -webkit-user-drag: none;
     }
 
+    /* Жесткий черный фон без perspective на body, чтобы снизу никогда не вылезала белая полоса */
     html, body {
       width: 100%;
-      min-height: 100vh;
-      background-color: #050608;
+      min-height: 100%;
+      background-color: #050608 !important;
       color: var(--text-main);
       font-family: 'JetBrains Mono', monospace;
       overflow-x: hidden;
-      perspective: 1200px;
+      overscroll-behavior: none;
     }
 
-    /* === ФОНОВОЕ ВИДЕО С 3D ПАРАЛЛАКСОМ И ЗАТЕМНЕНИЕМ === */
-    .bg-wrapper {
+    /* === ЕДИНАЯ ФИКСИРОВАННАЯ СЦЕНА ФОНА (БЕЗ ЗАЗОРОВ СНИЗУ) === */
+    .viewport-bg {
       position: fixed;
-      inset: -6%;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100dvh;
+      z-index: 0;
+      overflow: hidden;
+      background-color: #050608;
+      pointer-events: none;
+    }
+
+    .bg-wrapper {
+      position: absolute;
+      inset: -12%;
+      width: 124%;
+      height: 124%;
       z-index: 0;
       pointer-events: none;
-      overflow: hidden;
       will-change: transform;
     }
 
@@ -52,28 +65,64 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: saturate(1.15) contrast(1.05);
-      transform: scale(1.05);
-    }
-
-    /* Слой затемнения и легкого блюра поверх видео */
-    .bg-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 1;
-      background: 
-        radial-gradient(circle at 50% 45%, rgba(8, 10, 14, 0.48) 0%, rgba(4, 5, 8, 0.86) 100%),
-        linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.75) 100%);
-      backdrop-filter: blur(10px) saturate(140%);
-      -webkit-backdrop-filter: blur(10px) saturate(140%);
+      filter: saturate(1.15) contrast(1.05) brightness(0.85);
       pointer-events: none;
     }
 
-    /* Тонкая сетка в стиле работ aezakmi */
-    .cyber-grid {
-      position: fixed;
+    /* === СЛОЙ ПЕЧАТАЮЩИХСЯ ASCII-АРТОВ (ВБЛИЗИ И ВДАЛИ, ПОД БЛЮРОМ) === */
+    .ascii-bg-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+      perspective: 900px;
+    }
+
+    .ascii-floating-node {
+      position: absolute;
+      white-space: pre;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--acid-green);
+      line-height: 1.2;
+      letter-spacing: 0.04em;
+      pointer-events: none;
+      will-change: transform, opacity;
+      transition: opacity 1.8s ease;
+      text-shadow: 0 0 12px rgba(158, 255, 0, 0.35);
+    }
+
+    /* Эффект мигающего курсора при печати */
+    .ascii-floating-node.typing::after {
+      content: '█';
+      display: inline-block;
+      margin-left: 2px;
+      animation: blinkCursor 0.5s step-end infinite;
+    }
+
+    @keyframes blinkCursor {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* Слой затемнения и Apple-блюра ПОВЕРХ видео и ПОВЕРХ печатающихся ASCII */
+    .bg-overlay {
+      position: absolute;
       inset: 0;
       z-index: 2;
+      background: 
+        radial-gradient(circle at 50% 45%, rgba(8, 10, 14, 0.52) 0%, rgba(4, 5, 8, 0.90) 100%),
+        linear-gradient(180deg, rgba(5, 6, 8, 0.4) 0%, rgba(5, 6, 8, 0.88) 100%);
+      backdrop-filter: blur(8px) saturate(140%);
+      -webkit-backdrop-filter: blur(8px) saturate(140%);
+      pointer-events: none;
+    }
+
+    /* Тонкая кибер-сетка */
+    .cyber-grid {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
       background-image: 
         linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
@@ -130,14 +179,14 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      padding: 110px 20px 80px;
+      min-height: 100dvh;
+      padding: 110px 20px 90px;
       gap: 56px;
     }
 
     /* === APPLE LIQUID GLASS КАРТОЧКА В ЦЕНТРЕ === */
     .liquid-card-scene {
-      perspective: 1000px;
+      perspective: 1100px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -168,20 +217,20 @@
       cursor: grab;
       will-change: transform;
       overflow: hidden;
+      touch-action: none;
     }
 
     .liquid-glass-card:active {
       cursor: grabbing;
     }
 
-    /* Динамический блик Apple Liquid Glass */
     .liquid-glare {
       position: absolute;
       inset: -50%;
       background: radial-gradient(
         circle at var(--glare-x, 50%) var(--glare-y, 50%),
-        rgba(255, 255, 255, 0.22) 0%,
-        rgba(158, 255, 0, 0.06) 25%,
+        rgba(255, 255, 255, 0.20) 0%,
+        rgba(158, 255, 0, 0.05) 25%,
         transparent 60%
       );
       pointer-events: none;
@@ -196,7 +245,7 @@
       flex-direction: column;
       align-items: center;
       text-align: center;
-      transform: translateZ(35px);
+      transform: translateZ(28px);
     }
 
     /* === ЦЕНТРАЛЬНЫЙ БЛОК: AEZAKMI + ЧЕРНАЯ ФИГУРА ЗВЕЗД === */
@@ -220,7 +269,6 @@
       text-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
     }
 
-    /* Капсула из светлого жидкого стекла, чтобы УМЕНЬШЕННАЯ ЧЕРНАЯ ФИГУРА четко читалась */
     .black-star-badge {
       display: inline-flex;
       align-items: center;
@@ -233,19 +281,18 @@
         0 8px 20px rgba(0, 0, 0, 0.35),
         inset 0 1px 2px #ffffff;
       border: 1px solid rgba(255, 255, 255, 0.6);
-      transform: translateZ(20px);
+      transform: translateZ(16px);
       transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.4);
     }
 
     .liquid-glass-card:hover .black-star-badge {
-      transform: translateZ(30px) rotate(8deg) scale(1.08);
+      transform: translateZ(24px) rotate(8deg) scale(1.06);
     }
 
-    /* Та самая 5-я картинка — уменьшенная черненькая фигура со звездами */
     .black-sparkles-svg {
       width: 28px;
       height: 28px;
-      fill: #0b0c0e; /* Чистый глубокий черный цвет */
+      fill: #0b0c0e;
     }
 
     .brand-subtitle {
@@ -256,7 +303,6 @@
       margin-bottom: 24px;
     }
 
-    /* Пасхалка с ASCII-котом из видео aezakmi */
     .ascii-terminal {
       font-size: 11px;
       line-height: 1.35;
@@ -280,7 +326,7 @@
       line-height: 1.15;
     }
 
-    /* === КНОПКИ СОЦСЕТЕЙ С МАГНИТНОЙ ФИЗИКОЙ (PATREON, INST, TT) === */
+    /* === КНОПКИ СОЦСЕТЕЙ === */
     .social-dock {
       display: flex;
       gap: 12px;
@@ -360,28 +406,29 @@
       position: relative;
       border-radius: 24px;
       overflow: hidden;
-      background: rgba(16, 18, 24, 0.55);
+      background: rgba(16, 18, 24, 0.65);
       border: 1px solid rgba(255, 255, 255, 0.14);
       backdrop-filter: blur(20px);
       aspect-ratio: 16 / 9;
       transform-style: preserve-3d;
       will-change: transform;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
-      cursor: pointer;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     }
 
+    /* pointer-events: none полностью блокирует клик и скачивание видео напрямую */
     .work-card video,
     .work-card img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
+      pointer-events: none;
       transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
     .work-card:hover video,
     .work-card:hover img {
-      transform: scale(1.05);
+      transform: scale(1.04);
     }
 
     .work-hud {
@@ -391,15 +438,16 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 40%, rgba(0,0,0,0.68) 100%);
+      background: linear-gradient(180deg, rgba(0,0,0,0.42) 0%, transparent 45%, rgba(0,0,0,0.72) 100%);
       font-size: 11px;
+      z-index: 2;
     }
 
     .work-tag {
       align-self: flex-start;
-      padding: 4px 10px;
+      padding: 5px 11px;
       border-radius: 999px;
-      background: rgba(0, 0, 0, 0.55);
+      background: rgba(0, 0, 0, 0.6);
       border: 1px solid rgba(255, 255, 255, 0.15);
       backdrop-filter: blur(8px);
       color: #fff;
@@ -408,7 +456,11 @@
     .sound-btn {
       pointer-events: auto;
       cursor: pointer;
-      transition: border-color 0.2s, color 0.2s;
+      transition: border-color 0.2s, color 0.2s, transform 0.15s;
+    }
+
+    .sound-btn:active {
+      transform: scale(0.95);
     }
 
     .sound-btn.active {
@@ -426,13 +478,28 @@
 </head>
 <body>
 
-  <!-- 1. ФОНОВОЕ ВИДЕО С ЗЕЛЕНОЙ ФИГУРОЙ -->
-  <div class="bg-wrapper" id="bgWrapper">
-    <video class="bg-video" src="bg.mp4" autoplay loop muted playsinline></video>
+  <!-- 1. ФИКСИРОВАННАЯ СЦЕНА ФОНА: ВИДЕО + ПЕЧАТАЮЩИЙСЯ ASCII + БЛЮР -->
+  <div class="viewport-bg">
+    <div class="bg-wrapper" id="bgWrapper">
+      <video 
+        class="bg-video" 
+        src="bg.mp4" 
+        autoplay 
+        loop 
+        muted 
+        playsinline 
+        disablePictureInPicture 
+        controlsList="nodownload nofullscreen noremoteplayback"
+      ></video>
+    </div>
+
+    <!-- Слой, где вблизи и вдали печатаются ASCII-элементы (лежит ПОД блюром) -->
+    <div class="ascii-bg-layer" id="asciiBgLayer"></div>
+
+    <!-- Слой затемнения и блюра (размывает и видео, и ASCII) -->
+    <div class="bg-overlay"></div>
+    <div class="cyber-grid"></div>
   </div>
-  <!-- APPLE LIQUID GLASS ЗАТЕМНЕНИЕ И БЛЮР -->
-  <div class="bg-overlay"></div>
-  <div class="cyber-grid"></div>
 
   <!-- 2. ВЕРХНИЙ HUD В СТИЛЕ AEZAKMI -->
   <header class="hud-bar">
@@ -450,19 +517,13 @@
         <div class="liquid-glare" id="liquidGlare"></div>
 
         <div class="card-content">
-          <!-- Центральный заголовок aezakmi + уменьшенная черная фигура 5-го фото -->
           <div class="brand-title-row">
             <h1 class="brand-name">aezakmi</h1>
             <div class="black-star-badge" title="aezakmi visual mark">
-              <!-- Точная векторная копия 5-й фотографии (черные 4-конечные звезды) -->
               <svg class="black-sparkles-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <!-- Большая центральная звезда -->
                 <path d="M48 16 C48 41 41 48 16 48 C41 48 48 55 48 80 C48 55 55 48 80 48 C55 48 48 41 48 16 Z" />
-                <!-- Верхняя левая звезда -->
                 <path d="M26 8 C26 20 20 26 8 26 C20 26 26 32 26 44 C26 32 32 26 44 26 C32 26 26 20 26 8 Z" />
-                <!-- Правая верхняя звезда -->
                 <path d="M77 24 C77 33 71 39 62 39 C71 39 77 45 77 54 C77 45 83 39 92 39 C83 39 77 33 77 24 Z" />
-                <!-- Правая нижняя малая звезда -->
                 <path d="M68 58 C68 65 63 70 56 70 C63 70 68 75 68 82 C68 75 73 70 80 70 C73 70 68 65 68 58 Z" />
               </svg>
             </div>
@@ -470,7 +531,6 @@
 
           <p class="brand-subtitle">3D / Motion / Visual Architecture</p>
 
-          <!-- Терминал с ASCII-котом из концовки его первого видео -->
           <div class="ascii-terminal">
             <div class="ascii-cat"> /\___/\
 (  o.o  )
@@ -481,7 +541,6 @@
             </div>
           </div>
 
-          <!-- Кнопки соцсетей (СЮДА ВСТАВИШЬ ЕГО ССЫЛКИ В href="") -->
           <div class="social-dock">
             <a href="https://patreon.com/" target="_blank" class="magnetic-btn">
               <svg viewBox="0 0 24 24"><path d="M14.82 2.41C18.78 2.41 22 5.65 22 9.62C22 13.58 18.78 16.8 14.82 16.8C10.85 16.8 7.61 13.58 7.61 9.62C7.61 5.65 10.85 2.41 14.82 2.41M2 21.6H5.5V2.41H2V21.6Z"/></svg>
@@ -499,12 +558,12 @@
             </a>
           </div>
 
-          <div class="hint-drag">[ Нажми и потяни карточку — физика активна ]</div>
+          <div class="hint-drag">[ Нажми и потяни карточку — мягкая физика активна ]</div>
         </div>
       </div>
     </div>
 
-    <!-- 4. ВИТРИНА РАБОТ С 3D НАКЛОНОМ -->
+    <!-- 4. ВИТРИНА РАБОТ С ЗАЩИТОЙ ОТ СКАЧИВАНИЯ И МЯГКИМ ЗВУКОМ (25%) -->
     <section class="showcase-section">
       <div class="showcase-header">
         <span>// SELECTED_WORKS [04]</span>
@@ -512,25 +571,38 @@
       </div>
 
       <div class="showcase-grid">
-        <!-- Видео 1: Кислотная 3D фигура -->
         <div class="work-card tilt-item">
-          <video src="bg.mp4" autoplay loop muted playsinline></video>
+          <video 
+            src="bg.mp4" 
+            autoplay 
+            loop 
+            muted 
+            playsinline 
+            disablePictureInPicture 
+            controlsList="nodownload nofullscreen noremoteplayback"
+          ></video>
           <div class="work-hud">
             <span class="work-tag sound-btn" onclick="toggleSound(this)">🔇 SOUND OFF</span>
             <span>01 // protocol_zero.mp4</span>
           </div>
         </div>
 
-        <!-- Видео 2: Сакура + трекинг -->
         <div class="work-card tilt-item">
-          <video src="sakura.mp4" autoplay loop muted playsinline></video>
+          <video 
+            src="sakura.mp4" 
+            autoplay 
+            loop 
+            muted 
+            playsinline 
+            disablePictureInPicture 
+            controlsList="nodownload nofullscreen noremoteplayback"
+          ></video>
           <div class="work-hud">
             <span class="work-tag sound-btn" onclick="toggleSound(this)">🔇 SOUND OFF</span>
             <span>02 // impl_moment_hud.mp4</span>
           </div>
         </div>
 
-        <!-- Скриншот 1 -->
         <div class="work-card tilt-item">
           <img src="work1.jpg" alt="aezakmi data_stream">
           <div class="work-hud">
@@ -539,7 +611,6 @@
           </div>
         </div>
 
-        <!-- Скриншот 2 -->
         <div class="work-card tilt-item">
           <img src="work2.jpg" alt="aezakmi signal.lost">
           <div class="work-hud">
@@ -552,25 +623,49 @@
   </main>
 
   <script>
-    // === 1. ЗАЩИТА КОНТЕНТА (АНТИ-КЛИК И ХОТКЕИ) ===
+    // === 1. ЖЕСТКАЯ ЗАЩИТА КОНТЕНТА И ВИДЕО ===
     document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('dragstart', e => e.preventDefault());
     document.addEventListener('keydown', e => {
-      if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) || (e.ctrlKey && e.key === 'u')) {
+      if (
+        e.key === 'F12' || 
+        (e.ctrlKey && e.shiftKey && ['I', 'J', 'C', 'S'].includes(e.key.toUpperCase())) || 
+        (e.ctrlKey && ['U', 'S'].includes(e.key.toUpperCase()))
+      ) {
         e.preventDefault();
       }
     });
 
-    // === 2. ПЕРЕКЛЮЧЕНИЕ ЗВУКА В ШОУРИЛЕ ===
+    // === 2. ПОНИЖЕННАЯ ГРОМКОСТЬ ВИДЕО (25%) ===
+    const DEFAULT_VOLUME = 0.22; // Комфортная тихая громкость (22%)
+    document.querySelectorAll('video').forEach(vid => {
+      vid.volume = DEFAULT_VOLUME;
+    });
+
     function toggleSound(btn) {
       const card = btn.closest('.work-card');
       const video = card.querySelector('video');
       if (!video) return;
+
+      // При включении звука на одном видео — глушим остальные, чтобы не было каши
+      document.querySelectorAll('.work-card video').forEach(otherVid => {
+        if (otherVid !== video) {
+          otherVid.muted = true;
+          const otherBtn = otherVid.closest('.work-card').querySelector('.sound-btn');
+          if (otherBtn) {
+            otherBtn.textContent = '🔇 SOUND OFF';
+            otherBtn.classList.remove('active');
+          }
+        }
+      });
+
+      video.volume = DEFAULT_VOLUME;
       video.muted = !video.muted;
-      btn.textContent = video.muted ? '🔇 SOUND OFF' : '🔊 SOUND ON';
+      btn.textContent = video.muted ? '🔇 SOUND OFF' : '🔉 SOUND 22%';
       btn.classList.toggle('active', !video.muted);
     }
 
-    // === 3. ДВИЖОК ПРУЖИННОЙ 3D-ФИЗИКИ ДЛЯ LIQUID GLASS КАРТОЧКИ ===
+    // === 3. ДЕЛИКАТНАЯ, МЯГКАЯ ФИЗИКА КАРТОЧКИ (С ОГРАНИЧЕНИЕМ УНОСА) ===
     const card = document.getElementById('liquidCard');
     const glare = document.getElementById('liquidGlare');
     const bgWrapper = document.getElementById('bgWrapper');
@@ -586,16 +681,17 @@
       startX: 0, startY: 0
     };
 
-    const stiffness = 0.085; // Жесткость пружины
-    const damping = 0.78;    // Затухание инерции
+    const stiffness = 0.055; // Более мягкая и плавная пружина
+    const damping = 0.82;    // Плавное вязкое затухание
+    const maxDragDist = 38;  // Максимальный сдвиг карточки в пикселях (чтобы нельзя было унести далеко)
 
     window.addEventListener('pointermove', (e) => {
       const normX = (e.clientX / window.innerWidth) - 0.5;
       const normY = (e.clientY / window.innerHeight) - 0.5;
 
-      // 3D наклон от положения курсора
-      state.targetRotY = normX * 24;
-      state.targetRotX = -normY * 24;
+      // Мягкий 3D наклон (максимум 10 градусов вместо 24)
+      state.targetRotY = normX * 10;
+      state.targetRotX = -normY * 10;
 
       // Обновляем блик Liquid Glass
       const rect = card.getBoundingClientRect();
@@ -604,21 +700,23 @@
       glare.style.setProperty('--glare-x', `${glareX}%`);
       glare.style.setProperty('--glare-y', `${glareY}%`);
 
-      // Плавный параллакс фонового видео
-      bgWrapper.style.transform = `translate3d(${-normX * 28}px, ${-normY * 28}px, 0)`;
+      // Деликатный параллакс фонового видео
+      bgWrapper.style.transform = `translate3d(${-normX * 16}px, ${-normY * 16}px, 0)`;
 
-      // Если карточку тянут мышкой/пальцем
+      // Если карточку тянут — мягкое упругое сопротивление (clamp + tanh-подобное сжатие)
       if (state.isDragging) {
-        state.targetPosX = (e.clientX - state.startX) * 0.55;
-        state.targetPosY = (e.clientY - state.startY) * 0.55;
+        const rawDx = (e.clientX - state.startX) * 0.18;
+        const rawDy = (e.clientY - state.startY) * 0.18;
+        state.targetPosX = Math.max(-maxDragDist, Math.min(maxDragDist, rawDx));
+        state.targetPosY = Math.max(-maxDragDist, Math.min(maxDragDist, rawDy));
       }
     });
 
     card.addEventListener('pointerdown', (e) => {
       if (e.target.closest('a')) return;
       state.isDragging = true;
-      state.startX = e.clientX - state.targetPosX;
-      state.startY = e.clientY - state.targetPosY;
+      state.startX = e.clientX - (state.targetPosX / 0.18);
+      state.startY = e.clientY - (state.targetPosY / 0.18);
       card.setPointerCapture(e.pointerId);
     });
 
@@ -629,13 +727,11 @@
     });
 
     function animatePhysics() {
-      // Расчет пружины для вращения
       state.velRotX = (state.velRotX + (state.targetRotX - state.rotX) * stiffness) * damping;
       state.velRotY = (state.velRotY + (state.targetRotY - state.rotY) * stiffness) * damping;
       state.rotX += state.velRotX;
       state.rotY += state.velRotY;
 
-      // Расчет пружины для перетаскивания
       state.velPosX = (state.velPosX + (state.targetPosX - state.posX) * stiffness) * damping;
       state.velPosY = (state.velPosY + (state.targetPosY - state.posY) * stiffness) * damping;
       state.posX += state.velPosX;
@@ -651,9 +747,9 @@
     document.querySelectorAll('.magnetic-btn').forEach(btn => {
       btn.addEventListener('mousemove', (e) => {
         const rect = btn.getBoundingClientRect();
-        const x = (e.clientX - rect.left - rect.width / 2) * 0.35;
-        const y = (e.clientY - rect.top - rect.height / 2) * 0.35;
-        btn.style.transform = `translate3d(${x}px, ${y}px, 15px)`;
+        const x = (e.clientX - rect.left - rect.width / 2) * 0.25;
+        const y = (e.clientY - rect.top - rect.height / 2) * 0.25;
+        btn.style.transform = `translate3d(${x}px, ${y}px, 10px)`;
       });
       btn.addEventListener('mouseleave', () => {
         btn.style.transform = 'translate3d(0, 0, 0)';
@@ -663,14 +759,102 @@
     document.querySelectorAll('.tilt-item').forEach(item => {
       item.addEventListener('mousemove', (e) => {
         const rect = item.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width - 0.5) * 14;
-        const y = ((e.clientY - rect.top) / rect.height - 0.5) * -14;
-        item.style.transform = `perspective(800px) rotateX(${y}deg) rotateY(${x}deg) scale3d(1.02, 1.02, 1.02)`;
+        const x = ((e.clientX - rect.left) / rect.width - 0.5) * 9;
+        const y = ((e.clientY - rect.top) / rect.height - 0.5) * -9;
+        item.style.transform = `perspective(800px) rotateX(${y}deg) rotateY(${x}deg) scale3d(1.015, 1.015, 1.015)`;
       });
       item.addEventListener('mouseleave', () => {
         item.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
       });
     });
+
+    // === 5. ГЕНЕРАТОР ПЕЧАТАЮЩИХСЯ ASCII-АРТОВ НА ФОНЕ (ВБЛИЗИ И ВДАЛИ ПОД БЛЮРОМ) ===
+    const asciiLayer = document.getElementById('asciiBgLayer');
+
+    const asciiSnippets = [
+` /\\___/\\
+(  o.o  )
+ >  ^  <
+[aezakmi.node]`,
+
+`packet.send(x008a4f2x)
+├── decrypt(payload.deep)
+└── status: 0x01_ONLINE`,
+
+`   +---+
+  /   /|
+ +---+ +
+ |   |/
+ +---+
+mesh_v4.obj`,
+
+`fn describe(&self) -> String {
+  impl Moment { <time.h> }
+  fps: 60 // 3840x2160
+}`,
+
+`console.log("signal.lost")
+>> evade.loop(true)
+>> mask_identity(hex)`,
+
+`[x007e9d8x] scanning...
+████████▒▒ 82%
+layer_index: ASC`,
+
+`  .  *  .
+ *  /\\  *
+   /  \\
+  '----'
+shader_init()`
+    ];
+
+    function spawnTypingAscii() {
+      const node = document.createElement('div');
+      node.className = 'ascii-floating-node typing';
+
+      // Выбираем глубину: true = вблизи (крупнее и ярче), false = вдали (мельче и тусклее)
+      const isNear = Math.random() > 0.55;
+      const scale = isNear ? (0.95 + Math.random() * 0.35) : (0.55 + Math.random() * 0.25);
+      const opacity = isNear ? (0.42 + Math.random() * 0.22) : (0.16 + Math.random() * 0.14);
+      const extraBlur = isNear ? '0px' : '1.5px';
+
+      // Случайная позиция по краям и фону экрана
+      const posX = 5 + Math.random() * 82;
+      const posY = 8 + Math.random() * 80;
+
+      node.style.left = `${posX}%`;
+      node.style.top = `${posY}%`;
+      node.style.fontSize = '12px';
+      node.style.opacity = opacity;
+      node.style.filter = `blur(${extraBlur})`;
+      node.style.transform = `scale(${scale})`;
+
+      asciiLayer.appendChild(node);
+
+      const fullText = asciiSnippets[Math.floor(Math.random() * asciiSnippets.length)];
+      let charIndex = 0;
+
+      // Посимвольная печать как в терминале
+      const typeTimer = setInterval(() => {
+        charIndex++;
+        node.textContent = fullText.slice(0, charIndex);
+
+        if (charIndex >= fullText.length) {
+          clearInterval(typeTimer);
+          // Держим напечатанный блок пару секунд и плавно растворяем
+          setTimeout(() => {
+            node.classList.remove('typing');
+            node.style.opacity = '0';
+            setTimeout(() => node.remove(), 1900);
+          }, 3200 + Math.random() * 2500);
+        }
+      }, 28 + Math.random() * 22);
+    }
+
+    // Запускаем стартовые ASCII-блоки сразу и затем каждые 3.5 секунды печатаем новые
+    spawnTypingAscii();
+    setTimeout(spawnTypingAscii, 1400);
+    setInterval(spawnTypingAscii, 3500);
   </script>
 </body>
 </html>
