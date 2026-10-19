@@ -1,1 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>aezakmi — visual & motion</title>
+  <!-- Подключаем стильные шрифты: Syne для никнейма и JetBrains Mono для кибер-телеметрии -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
 
+  <style>
+    :root {
+      --glass-bg: rgba(12, 14, 18, 0.58);
+      --glass-border: rgba(255, 255, 255, 0.16);
+      --glass-highlight: rgba(255, 255, 255, 0.32);
+      --acid-green: #9eff00;
+      --text-main: #f5f7fa;
+      --text-muted: rgba(245, 247, 250, 0.55);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      background-color: #050608;
+      color: var(--text-main);
+      font-family: 'JetBrains Mono', monospace;
+      overflow-x: hidden;
+      perspective: 1200px;
+    }
+
+    /* === ФОНОВОЕ ВИДЕО С 3D ПАРАЛЛАКСОМ И ЗАТЕМНЕНИЕМ === */
+    .bg-wrapper {
+      position: fixed;
+      inset: -6%;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+      will-change: transform;
+    }
+
+    .bg-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(1.15) contrast(1.05);
+      transform: scale(1.05);
+    }
+
+    /* Слой затемнения и легкого блюра поверх видео */
+    .bg-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      background: 
+        radial-gradient(circle at 50% 45%, rgba(8, 10, 14, 0.48) 0%, rgba(4, 5, 8, 0.86) 100%),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.75) 100%);
+      backdrop-filter: blur(10px) saturate(140%);
+      -webkit-backdrop-filter: blur(10px) saturate(140%);
+      pointer-events: none;
+    }
+
+    /* Тонкая сетка в стиле работ aezakmi */
+    .cyber-grid {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 64px 64px;
+      pointer-events: none;
+    }
+
+    /* === ВЕРХНЯЯ ТЕЛЕМЕТРИЯ (HUD) === */
+    .hud-bar {
+      position: fixed;
+      top: 24px;
+      left: 32px;
+      right: 32px;
+      z-index: 20;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .hud-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(15, 18, 24, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 6px 12px;
+      border-radius: 999px;
+      backdrop-filter: blur(12px);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--acid-green);
+      box-shadow: 0 0 10px var(--acid-green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(0.85); }
+    }
+
+    /* === ОСНОВНОЙ КОНТЕЙНЕР === */
+    main {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 110px 20px 80px;
+      gap: 56px;
+    }
+
+    /* === APPLE LIQUID GLASS КАРТОЧКА В ЦЕНТРЕ === */
+    .liquid-card-scene {
+      perspective: 1000px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      max-width: 540px;
+    }
+
+    .liquid-glass-card {
+      position: relative;
+      width: 100%;
+      padding: 46px 40px 38px;
+      border-radius: 36px;
+      background: linear-gradient(
+        135deg,
+        rgba(28, 32, 40, 0.62) 0%,
+        rgba(12, 14, 18, 0.48) 50%,
+        rgba(20, 24, 30, 0.68) 100%
+      );
+      backdrop-filter: blur(28px) saturate(190%) contrast(105%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%) contrast(105%);
+      border: 1px solid var(--glass-border);
+      box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.55),
+        inset 0 1px 1px var(--glass-highlight),
+        inset 0 -1px 2px rgba(0, 0, 0, 0.5),
+        inset 0 0 28px rgba(255, 255, 255, 0.04);
+      transform-style: preserve-3d;
+      cursor: grab;
+      will-change: transform;
+      overflow: hidden;
+    }
+
+    .liquid-glass-card:active {
+      cursor: grabbing;
+    }
+
+    /* Динамический блик Apple Liquid Glass */
+    .liquid-glare {
+      position: absolute;
+      inset: -50%;
+      background: radial-gradient(
+        circle at var(--glare-x, 50%) var(--glare-y, 50%),
+        rgba(255, 255, 255, 0.22) 0%,
+        rgba(158, 255, 0, 0.06) 25%,
+        transparent 60%
+      );
+      pointer-events: none;
+      z-index: 0;
+      mix-blend-mode: screen;
+    }
+
+    .card-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transform: translateZ(35px);
+    }
+
+    /* === ЦЕНТРАЛЬНЫЙ БЛОК: AEZAKMI + ЧЕРНАЯ ФИГУРА ЗВЕЗД === */
+    .brand-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    .brand-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2.6rem, 7vw, 3.8rem);
+      letter-spacing: -0.04em;
+      line-height: 1;
+      background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.72) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Капсула из светлого жидкого стекла, чтобы УМЕНЬШЕННАЯ ЧЕРНАЯ ФИГУРА четко читалась */
+    .black-star-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(215, 225, 235, 0.78));
+      box-shadow: 
+        0 8px 20px rgba(0, 0, 0, 0.35),
+        inset 0 1px 2px #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      transform: translateZ(20px);
+      transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.4);
+    }
+
+    .liquid-glass-card:hover .black-star-badge {
+      transform: translateZ(30px) rotate(8deg) scale(1.08);
+    }
+
+    /* Та самая 5-я картинка — уменьшенная черненькая фигура со звездами */
+    .black-sparkles-svg {
+      width: 28px;
+      height: 28px;
+      fill: #0b0c0e; /* Чистый глубокий черный цвет */
+    }
+
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    /* Пасхалка с ASCII-котом из видео aezakmi */
+    .ascii-terminal {
+      font-size: 11px;
+      line-height: 1.35;
+      color: rgba(255, 255, 255, 0.75);
+      background: rgba(0, 0, 0, 0.38);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 10px 18px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-align: left;
+      backdrop-filter: blur(8px);
+    }
+
+    .ascii-cat {
+      white-space: pre;
+      font-size: 10px;
+      color: var(--acid-green);
+      line-height: 1.15;
+    }
+
+    /* === КНОПКИ СОЦСЕТЕЙ С МАГНИТНОЙ ФИЗИКОЙ (PATREON, INST, TT) === */
+    .social-dock {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .magnetic-btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 13px 22px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+      will-change: transform;
+    }
+
+    .magnetic-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(158, 255, 0, 0.55);
+      box-shadow: 
+        0 10px 25px rgba(0, 0, 0, 0.35),
+        0 0 18px rgba(158, 255, 0, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+
+    .magnetic-btn svg {
+      width: 15px;
+      height: 15px;
+      fill: currentColor;
+    }
+
+    .hint-drag {
+      margin-top: 20px;
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.32);
+      letter-spacing: 0.08em;
+    }
+
+    /* === СЕКЦИЯ ВИТРИНЫ РАБОТ (3D SHOWCASE) === */
+    .showcase-section {
+      width: 100%;
+      max-width: 980px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .showcase-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 0 8px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .showcase-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .work-card {
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      background: rgba(16, 18, 24, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(20px);
+      aspect-ratio: 16 / 9;
+      transform-style: preserve-3d;
+      will-change: transform;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+      cursor: pointer;
+    }
+
+    .work-card video,
+    .work-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .work-card:hover video,
+    .work-card:hover img {
+      transform: scale(1.05);
+    }
+
+    .work-hud {
+      position: absolute;
+      inset: 0;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 40%, rgba(0,0,0,0.68) 100%);
+      font-size: 11px;
+    }
+
+    .work-tag {
+      align-self: flex-start;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      color: #fff;
+    }
+
+    .sound-btn {
+      pointer-events: auto;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .sound-btn.active {
+      border-color: var(--acid-green);
+      color: var(--acid-green);
+    }
+
+    @media (max-width: 600px) {
+      .hud-bar { left: 16px; right: 16px; top: 16px; }
+      .liquid-glass-card { padding: 34px 22px 28px; border-radius: 28px; }
+      .social-dock { gap: 8px; }
+      .magnetic-btn { padding: 11px 16px; font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. ФОНОВОЕ ВИДЕО С ЗЕЛЕНОЙ ФИГУРОЙ -->
+  <div class="bg-wrapper" id="bgWrapper">
+    <video class="bg-video" src="bg.mp4" autoplay loop muted playsinline></video>
+  </div>
+  <!-- APPLE LIQUID GLASS ЗАТЕМНЕНИЕ И БЛЮР -->
+  <div class="bg-overlay"></div>
+  <div class="cyber-grid"></div>
+
+  <!-- 2. ВЕРХНИЙ HUD В СТИЛЕ AEZAKMI -->
+  <header class="hud-bar">
+    <div>data_stream: [x002a9f4x]</div>
+    <div class="hud-status">
+      <span class="status-dot"></span>
+      <span>aezakmi.status: online</span>
+    </div>
+  </header>
+
+  <!-- 3. ГЛАВНАЯ СЦЕНА -->
+  <main>
+    <div class="liquid-card-scene">
+      <div class="liquid-glass-card" id="liquidCard">
+        <div class="liquid-glare" id="liquidGlare"></div>
+
+        <div class="card-content">
+          <!-- Центральный заголовок aezakmi + уменьшенная черная фигура 5-го фото -->
+          <div class="brand-title-row">
+            <h1 class="brand-name">aezakmi</h1>
+            <div class="black-star-badge" title="aezakmi visual mark">
+              <!-- Точная векторная копия 5-й фотографии (черные 4-конечные звезды) -->
+              <svg class="black-sparkles-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Большая центральная звезда -->
+                <path d="M48 16 C48 41 41 48 16 48 C41 48 48 55 48 80 C48 55 55 48 80 48 C55 48 48 41 48 16 Z" />
+                <!-- Верхняя левая звезда -->
+                <path d="M26 8 C26 20 20 26 8 26 C20 26 26 32 26 44 C26 32 32 26 44 26 C32 26 26 20 26 8 Z" />
+                <!-- Правая верхняя звезда -->
+                <path d="M77 24 C77 33 71 39 62 39 C71 39 77 45 77 54 C77 45 83 39 92 39 C83 39 77 33 77 24 Z" />
+                <!-- Правая нижняя малая звезда -->
+                <path d="M68 58 C68 65 63 70 56 70 C63 70 68 75 68 82 C68 75 73 70 80 70 C73 70 68 65 68 58 Z" />
+              </svg>
+            </div>
+          </div>
+
+          <p class="brand-subtitle">3D / Motion / Visual Architecture</p>
+
+          <!-- Терминал с ASCII-котом из концовки его первого видео -->
+          <div class="ascii-terminal">
+            <div class="ascii-cat"> /\___/\
+(  o.o  )
+ &gt;  ^  &lt;</div>
+            <div>
+              <div style="color: #9eff00;">[x007e9d8x] scanning...</div>
+              <div>fps: 60 // 3840x2160</div>
+            </div>
+          </div>
+
+          <!-- Кнопки соцсетей (СЮДА ВСТАВИШЬ ЕГО ССЫЛКИ В href="") -->
+          <div class="social-dock">
+            <a href="https://patreon.com/" target="_blank" class="magnetic-btn">
+              <svg viewBox="0 0 24 24"><path d="M14.82 2.41C18.78 2.41 22 5.65 22 9.62C22 13.58 18.78 16.8 14.82 16.8C10.85 16.8 7.61 13.58 7.61 9.62C7.61 5.65 10.85 2.41 14.82 2.41M2 21.6H5.5V2.41H2V21.6Z"/></svg>
+              <span>Patreon</span>
+            </a>
+
+            <a href="https://instagram.com/" target="_blank" class="magnetic-btn">
+              <svg viewBox="0 0 24 24"><path d="M7.8,2H16.2C19.4,2 22,4.6 22,7.8V16.2A5.8,5.8 0 0,1 16.2,22H7.8C4.6,22 2,19.4 2,16.2V7.8A5.8,5.8 0 0,1 7.8,2M7.6,4A3.6,3.6 0 0,0 4,7.6V16.4C4,18.39 5.61,20 7.6,20H16.4A3.6,3.6 0 0,0 20,16.4V7.6C20,5.61 18.39,4 16.4,4H7.6M17.25,5.5A1.25,1.25 0 0,1 18.5,6.75A1.25,1.25 0 0,1 17.25,8A1.25,1.25 0 0,1 16,6.75A1.25,1.25 0 0,1 17.25,5.5M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9Z"/></svg>
+              <span>Instagram</span>
+            </a>
+
+            <a href="https://tiktok.com/" target="_blank" class="magnetic-btn">
+              <svg viewBox="0 0 24 24"><path d="M16.6 5.82s.51.5 0 0A4.278 4.278 0 0 1 15.54 3h-3.09v12.4a2.592 2.592 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6c0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64c0 3.33 2.76 5.7 5.69 5.7c3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3s-1.88.09-3.24-1.48z"/></svg>
+              <span>TikTok</span>
+            </a>
+          </div>
+
+          <div class="hint-drag">[ Нажми и потяни карточку — физика активна ]</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. ВИТРИНА РАБОТ С 3D НАКЛОНОМ -->
+    <section class="showcase-section">
+      <div class="showcase-header">
+        <span>// SELECTED_WORKS [04]</span>
+        <span>payload.deep // 60fps</span>
+      </div>
+
+      <div class="showcase-grid">
+        <!-- Видео 1: Кислотная 3D фигура -->
+        <div class="work-card tilt-item">
+          <video src="bg.mp4" autoplay loop muted playsinline></video>
+          <div class="work-hud">
+            <span class="work-tag sound-btn" onclick="toggleSound(this)">🔇 SOUND OFF</span>
+            <span>01 // protocol_zero.mp4</span>
+          </div>
+        </div>
+
+        <!-- Видео 2: Сакура + трекинг -->
+        <div class="work-card tilt-item">
+          <video src="sakura.mp4" autoplay loop muted playsinline></video>
+          <div class="work-hud">
+            <span class="work-tag sound-btn" onclick="toggleSound(this)">🔇 SOUND OFF</span>
+            <span>02 // impl_moment_hud.mp4</span>
+          </div>
+        </div>
+
+        <!-- Скриншот 1 -->
+        <div class="work-card tilt-item">
+          <img src="work1.jpg" alt="aezakmi data_stream">
+          <div class="work-hud">
+            <span class="work-tag">STILL // 3D</span>
+            <span>03 // data_stream_vis</span>
+          </div>
+        </div>
+
+        <!-- Скриншот 2 -->
+        <div class="work-card tilt-item">
+          <img src="work2.jpg" alt="aezakmi signal.lost">
+          <div class="work-hud">
+            <span class="work-tag">STILL // MACRO</span>
+            <span>04 // signal.lost.relay</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // === 1. ЗАЩИТА КОНТЕНТА (АНТИ-КЛИК И ХОТКЕИ) ===
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+      if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) || (e.ctrlKey && e.key === 'u')) {
+        e.preventDefault();
+      }
+    });
+
+    // === 2. ПЕРЕКЛЮЧЕНИЕ ЗВУКА В ШОУРИЛЕ ===
+    function toggleSound(btn) {
+      const card = btn.closest('.work-card');
+      const video = card.querySelector('video');
+      if (!video) return;
+      video.muted = !video.muted;
+      btn.textContent = video.muted ? '🔇 SOUND OFF' : '🔊 SOUND ON';
+      btn.classList.toggle('active', !video.muted);
+    }
+
+    // === 3. ДВИЖОК ПРУЖИННОЙ 3D-ФИЗИКИ ДЛЯ LIQUID GLASS КАРТОЧКИ ===
+    const card = document.getElementById('liquidCard');
+    const glare = document.getElementById('liquidGlare');
+    const bgWrapper = document.getElementById('bgWrapper');
+
+    let state = {
+      rotX: 0, rotY: 0,
+      targetRotX: 0, targetRotY: 0,
+      velRotX: 0, velRotY: 0,
+      posX: 0, posY: 0,
+      targetPosX: 0, targetPosY: 0,
+      velPosX: 0, velPosY: 0,
+      isDragging: false,
+      startX: 0, startY: 0
+    };
+
+    const stiffness = 0.085; // Жесткость пружины
+    const damping = 0.78;    // Затухание инерции
+
+    window.addEventListener('pointermove', (e) => {
+      const normX = (e.clientX / window.innerWidth) - 0.5;
+      const normY = (e.clientY / window.innerHeight) - 0.5;
+
+      // 3D наклон от положения курсора
+      state.targetRotY = normX * 24;
+      state.targetRotX = -normY * 24;
+
+      // Обновляем блик Liquid Glass
+      const rect = card.getBoundingClientRect();
+      const glareX = ((e.clientX - rect.left) / rect.width) * 100;
+      const glareY = ((e.clientY - rect.top) / rect.height) * 100;
+      glare.style.setProperty('--glare-x', `${glareX}%`);
+      glare.style.setProperty('--glare-y', `${glareY}%`);
+
+      // Плавный параллакс фонового видео
+      bgWrapper.style.transform = `translate3d(${-normX * 28}px, ${-normY * 28}px, 0)`;
+
+      // Если карточку тянут мышкой/пальцем
+      if (state.isDragging) {
+        state.targetPosX = (e.clientX - state.startX) * 0.55;
+        state.targetPosY = (e.clientY - state.startY) * 0.55;
+      }
+    });
+
+    card.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('a')) return;
+      state.isDragging = true;
+      state.startX = e.clientX - state.targetPosX;
+      state.startY = e.clientY - state.targetPosY;
+      card.setPointerCapture(e.pointerId);
+    });
+
+    window.addEventListener('pointerup', () => {
+      state.isDragging = false;
+      state.targetPosX = 0;
+      state.targetPosY = 0;
+    });
+
+    function animatePhysics() {
+      // Расчет пружины для вращения
+      state.velRotX = (state.velRotX + (state.targetRotX - state.rotX) * stiffness) * damping;
+      state.velRotY = (state.velRotY + (state.targetRotY - state.rotY) * stiffness) * damping;
+      state.rotX += state.velRotX;
+      state.rotY += state.velRotY;
+
+      // Расчет пружины для перетаскивания
+      state.velPosX = (state.velPosX + (state.targetPosX - state.posX) * stiffness) * damping;
+      state.velPosY = (state.velPosY + (state.targetPosY - state.posY) * stiffness) * damping;
+      state.posX += state.velPosX;
+      state.posY += state.velPosY;
+
+      card.style.transform = `translate3d(${state.posX}px, ${state.posY}px, 0) rotateX(${state.rotX}deg) rotateY(${state.rotY}deg)`;
+
+      requestAnimationFrame(animatePhysics);
+    }
+    animatePhysics();
+
+    // === 4. МАГНИТНАЯ ФИЗИКА ДЛЯ КНОПОК СОЦСЕТЕЙ И КАРТОЧЕК РАБОТ ===
+    document.querySelectorAll('.magnetic-btn').forEach(btn => {
+      btn.addEventListener('mousemove', (e) => {
+        const rect = btn.getBoundingClientRect();
+        const x = (e.clientX - rect.left - rect.width / 2) * 0.35;
+        const y = (e.clientY - rect.top - rect.height / 2) * 0.35;
+        btn.style.transform = `translate3d(${x}px, ${y}px, 15px)`;
+      });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.transform = 'translate3d(0, 0, 0)';
+      });
+    });
+
+    document.querySelectorAll('.tilt-item').forEach(item => {
+      item.addEventListener('mousemove', (e) => {
+        const rect = item.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width - 0.5) * 14;
+        const y = ((e.clientY - rect.top) / rect.height - 0.5) * -14;
+        item.style.transform = `perspective(800px) rotateX(${y}deg) rotateY(${x}deg) scale3d(1.02, 1.02, 1.02)`;
+      });
+      item.addEventListener('mouseleave', () => {
+        item.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+      });
+    });
+  </script>
+</body>
+</html>
