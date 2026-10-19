@@ -6,7 +6,7 @@
   <title>aezakmi — visual & motion</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root {
@@ -27,7 +27,6 @@
       -webkit-user-drag: none;
     }
 
-    /* Жесткий черный фон без perspective на body, чтобы снизу никогда не вылезала белая полоса */
     html, body {
       width: 100%;
       min-height: 100%;
@@ -38,7 +37,7 @@
       overscroll-behavior: none;
     }
 
-    /* === ЕДИНАЯ ФИКСИРОВАННАЯ СЦЕНА ФОНА (БЕЗ ЗАЗОРОВ СНИЗУ) === */
+    /* === ЕДИНАЯ ФИКСИРОВАННАЯ СЦЕНА ФОНА === */
     .viewport-bg {
       position: fixed;
       top: 0;
@@ -65,18 +64,43 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: saturate(1.15) contrast(1.05) brightness(0.85);
+      filter: saturate(1.15) contrast(1.05) brightness(0.75);
       pointer-events: none;
     }
 
-    /* === СЛОЙ ПЕЧАТАЮЩИХСЯ ASCII-АРТОВ (ВБЛИЗИ И ВДАЛИ, ПОД БЛЮРОМ) === */
-    .ascii-bg-layer {
+    /* Слой затемнения и блюра поверх видео */
+    .bg-overlay {
       position: absolute;
       inset: 0;
       z-index: 1;
+      background: 
+        radial-gradient(circle at 50% 45%, rgba(8, 10, 14, 0.55) 0%, rgba(4, 5, 8, 0.90) 100%),
+        linear-gradient(180deg, rgba(5, 6, 8, 0.4) 0%, rgba(5, 6, 8, 0.88) 100%);
+      backdrop-filter: blur(10px) saturate(140%);
+      -webkit-backdrop-filter: blur(10px) saturate(140%);
+      pointer-events: none;
+    }
+
+    /* === CANVАS ДОЖДЯ МАТРИЦЫ (ВБЛИЗИ И ВДАЛИ С МЯГКИМ БЛЮРОМ) === */
+    #matrixCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      opacity: 0.75;
+      filter: blur(0.6px);
+      pointer-events: none;
+    }
+
+    /* === СЛОЙ ПЕЧАТАЮЩИХСЯ ASCII-БЛОКОВ (ЯРКИЙ НЕОН ВБЛИЗИ И ВДАЛИ) === */
+    .ascii-bg-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
       pointer-events: none;
       overflow: hidden;
-      perspective: 900px;
+      perspective: 1000px;
     }
 
     .ascii-floating-node {
@@ -84,20 +108,28 @@
       white-space: pre;
       font-family: 'JetBrains Mono', monospace;
       color: var(--acid-green);
-      line-height: 1.2;
+      font-weight: 500;
+      line-height: 1.25;
       letter-spacing: 0.04em;
       pointer-events: none;
       will-change: transform, opacity;
-      transition: opacity 1.8s ease;
-      text-shadow: 0 0 12px rgba(158, 255, 0, 0.35);
+      transition: opacity 1.2s ease;
+      text-shadow: 
+        0 0 8px rgba(158, 255, 0, 0.8),
+        0 0 20px rgba(158, 255, 0, 0.4);
+      background: rgba(5, 8, 6, 0.28);
+      padding: 6px 10px;
+      border-left: 2px solid rgba(158, 255, 0, 0.65);
+      border-radius: 4px;
     }
 
-    /* Эффект мигающего курсора при печати */
     .ascii-floating-node.typing::after {
       content: '█';
       display: inline-block;
-      margin-left: 2px;
-      animation: blinkCursor 0.5s step-end infinite;
+      margin-left: 3px;
+      color: #ffffff;
+      text-shadow: 0 0 10px #9eff00;
+      animation: blinkCursor 0.45s step-end infinite;
     }
 
     @keyframes blinkCursor {
@@ -105,24 +137,11 @@
       50% { opacity: 0; }
     }
 
-    /* Слой затемнения и Apple-блюра ПОВЕРХ видео и ПОВЕРХ печатающихся ASCII */
-    .bg-overlay {
-      position: absolute;
-      inset: 0;
-      z-index: 2;
-      background: 
-        radial-gradient(circle at 50% 45%, rgba(8, 10, 14, 0.52) 0%, rgba(4, 5, 8, 0.90) 100%),
-        linear-gradient(180deg, rgba(5, 6, 8, 0.4) 0%, rgba(5, 6, 8, 0.88) 100%);
-      backdrop-filter: blur(8px) saturate(140%);
-      -webkit-backdrop-filter: blur(8px) saturate(140%);
-      pointer-events: none;
-    }
-
     /* Тонкая кибер-сетка */
     .cyber-grid {
       position: absolute;
       inset: 0;
-      z-index: 3;
+      z-index: 4;
       background-image: 
         linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
@@ -201,15 +220,15 @@
       border-radius: 36px;
       background: linear-gradient(
         135deg,
-        rgba(28, 32, 40, 0.62) 0%,
-        rgba(12, 14, 18, 0.48) 50%,
-        rgba(20, 24, 30, 0.68) 100%
+        rgba(22, 26, 32, 0.68) 0%,
+        rgba(10, 12, 16, 0.54) 50%,
+        rgba(18, 22, 28, 0.72) 100%
       );
-      backdrop-filter: blur(28px) saturate(190%) contrast(105%);
-      -webkit-backdrop-filter: blur(28px) saturate(190%) contrast(105%);
+      backdrop-filter: blur(24px) saturate(190%) contrast(105%);
+      -webkit-backdrop-filter: blur(24px) saturate(190%) contrast(105%);
       border: 1px solid var(--glass-border);
       box-shadow:
-        0 30px 60px rgba(0, 0, 0, 0.55),
+        0 30px 60px rgba(0, 0, 0, 0.65),
         inset 0 1px 1px var(--glass-highlight),
         inset 0 -1px 2px rgba(0, 0, 0, 0.5),
         inset 0 0 28px rgba(255, 255, 255, 0.04);
@@ -248,7 +267,6 @@
       transform: translateZ(28px);
     }
 
-    /* === ЦЕНТРАЛЬНЫЙ БЛОК: AEZAKMI + ЧЕРНАЯ ФИГУРА ЗВЕЗД === */
     .brand-title-row {
       display: flex;
       align-items: center;
@@ -326,7 +344,6 @@
       line-height: 1.15;
     }
 
-    /* === КНОПКИ СОЦСЕТЕЙ === */
     .social-dock {
       display: flex;
       gap: 12px;
@@ -378,7 +395,7 @@
       letter-spacing: 0.08em;
     }
 
-    /* === СЕКЦИЯ ВИТРИНЫ РАБОТ (3D SHOWCASE) === */
+    /* === СЕКЦИЯ ВИТРИНЫ РАБОТ === */
     .showcase-section {
       width: 100%;
       max-width: 980px;
@@ -415,7 +432,6 @@
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     }
 
-    /* pointer-events: none полностью блокирует клик и скачивание видео напрямую */
     .work-card video,
     .work-card img {
       width: 100%;
@@ -478,7 +494,7 @@
 </head>
 <body>
 
-  <!-- 1. ФИКСИРОВАННАЯ СЦЕНА ФОНА: ВИДЕО + ПЕЧАТАЮЩИЙСЯ ASCII + БЛЮР -->
+  <!-- 1. ФИКСИРОВАННАЯ СЦЕНА ФОНА: ВИДЕО + ЗАТЕМНЕНИЕ + МАТРИЦА + ПЕЧАТАЮЩИЙСЯ ASCII -->
   <div class="viewport-bg">
     <div class="bg-wrapper" id="bgWrapper">
       <video 
@@ -493,15 +509,19 @@
       ></video>
     </div>
 
-    <!-- Слой, где вблизи и вдали печатаются ASCII-элементы (лежит ПОД блюром) -->
+    <!-- Темное стекло поверх видео -->
+    <div class="bg-overlay"></div>
+
+    <!-- Дождь Матрицы с 3D-глубиной (вблизи и вдали) -->
+    <canvas id="matrixCanvas"></canvas>
+
+    <!-- Печатающиеся терминалы и ASCII-арты (вблизи и вдали с оптическим блюром) -->
     <div class="ascii-bg-layer" id="asciiBgLayer"></div>
 
-    <!-- Слой затемнения и блюра (размывает и видео, и ASCII) -->
-    <div class="bg-overlay"></div>
     <div class="cyber-grid"></div>
   </div>
 
-  <!-- 2. ВЕРХНИЙ HUD В СТИЛЕ AEZAKMI -->
+  <!-- 2. ВЕРХНИЙ HUD -->
   <header class="hud-bar">
     <div>data_stream: [x002a9f4x]</div>
     <div class="hud-status">
@@ -563,7 +583,7 @@
       </div>
     </div>
 
-    <!-- 4. ВИТРИНА РАБОТ С ЗАЩИТОЙ ОТ СКАЧИВАНИЯ И МЯГКИМ ЗВУКОМ (25%) -->
+    <!-- 4. ВИТРИНА РАБОТ -->
     <section class="showcase-section">
       <div class="showcase-header">
         <span>// SELECTED_WORKS [04]</span>
@@ -636,8 +656,8 @@
       }
     });
 
-    // === 2. ПОНИЖЕННАЯ ГРОМКОСТЬ ВИДЕО (25%) ===
-    const DEFAULT_VOLUME = 0.22; // Комфортная тихая громкость (22%)
+    // === 2. ПОНИЖЕННАЯ ГРОМКОСТЬ ВИДЕО (22%) ===
+    const DEFAULT_VOLUME = 0.22;
     document.querySelectorAll('video').forEach(vid => {
       vid.volume = DEFAULT_VOLUME;
     });
@@ -647,7 +667,6 @@
       const video = card.querySelector('video');
       if (!video) return;
 
-      // При включении звука на одном видео — глушим остальные, чтобы не было каши
       document.querySelectorAll('.work-card video').forEach(otherVid => {
         if (otherVid !== video) {
           otherVid.muted = true;
@@ -665,7 +684,7 @@
       btn.classList.toggle('active', !video.muted);
     }
 
-    // === 3. ДЕЛИКАТНАЯ, МЯГКАЯ ФИЗИКА КАРТОЧКИ (С ОГРАНИЧЕНИЕМ УНОСА) ===
+    // === 3. ДЕЛИКАТНАЯ ФИЗИКА КАРТОЧКИ ===
     const card = document.getElementById('liquidCard');
     const glare = document.getElementById('liquidGlare');
     const bgWrapper = document.getElementById('bgWrapper');
@@ -681,29 +700,25 @@
       startX: 0, startY: 0
     };
 
-    const stiffness = 0.055; // Более мягкая и плавная пружина
-    const damping = 0.82;    // Плавное вязкое затухание
-    const maxDragDist = 38;  // Максимальный сдвиг карточки в пикселях (чтобы нельзя было унести далеко)
+    const stiffness = 0.055;
+    const damping = 0.82;
+    const maxDragDist = 38;
 
     window.addEventListener('pointermove', (e) => {
       const normX = (e.clientX / window.innerWidth) - 0.5;
       const normY = (e.clientY / window.innerHeight) - 0.5;
 
-      // Мягкий 3D наклон (максимум 10 градусов вместо 24)
       state.targetRotY = normX * 10;
       state.targetRotX = -normY * 10;
 
-      // Обновляем блик Liquid Glass
       const rect = card.getBoundingClientRect();
       const glareX = ((e.clientX - rect.left) / rect.width) * 100;
       const glareY = ((e.clientY - rect.top) / rect.height) * 100;
       glare.style.setProperty('--glare-x', `${glareX}%`);
       glare.style.setProperty('--glare-y', `${glareY}%`);
 
-      // Деликатный параллакс фонового видео
       bgWrapper.style.transform = `translate3d(${-normX * 16}px, ${-normY * 16}px, 0)`;
 
-      // Если карточку тянут — мягкое упругое сопротивление (clamp + tanh-подобное сжатие)
       if (state.isDragging) {
         const rawDx = (e.clientX - state.startX) * 0.18;
         const rawDy = (e.clientY - state.startY) * 0.18;
@@ -743,7 +758,7 @@
     }
     animatePhysics();
 
-    // === 4. МАГНИТНАЯ ФИЗИКА ДЛЯ КНОПОК СОЦСЕТЕЙ И КАРТОЧЕК РАБОТ ===
+    // === 4. МАГНИТНЫЕ КНОПКИ И НАКЛОН РАБОТ ===
     document.querySelectorAll('.magnetic-btn').forEach(btn => {
       btn.addEventListener('mousemove', (e) => {
         const rect = btn.getBoundingClientRect();
@@ -768,65 +783,125 @@
       });
     });
 
-    // === 5. ГЕНЕРАТОР ПЕЧАТАЮЩИХСЯ ASCII-АРТОВ НА ФОНЕ (ВБЛИЗИ И ВДАЛИ ПОД БЛЮРОМ) ===
+    // === 5. 3D MATRIX RAIN НА CANVAS (ВБЛИЗИ И ВДАЛИ) ===
+    const canvas = document.getElementById('matrixCanvas');
+    const ctx = canvas.getContext('2d');
+    const matrixChars = '01AEZAKMIX008A4F2Xｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ<>[]{}/\\+=-*#';
+    let streams = [];
+
+    function initMatrix() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      streams = [];
+      const count = Math.floor(canvas.width / 26);
+
+      for (let i = 0; i < count; i++) {
+        // Глубина струи: isNear = вблизи (крупная и яркая), иначе вдали (мелкая и тусклая)
+        const isNear = Math.random() > 0.62;
+        streams.push({
+          x: i * 26 + (Math.random() * 10 - 5),
+          y: Math.random() * -canvas.height,
+          speed: isNear ? (1.8 + Math.random() * 2.2) : (0.7 + Math.random() * 1.1),
+          size: isNear ? 15 : 10,
+          alpha: isNear ? 0.55 : 0.22,
+          length: isNear ? 14 : 9,
+          chars: []
+        });
+      }
+    }
+
+    window.addEventListener('resize', initMatrix);
+    initMatrix();
+
+    function drawMatrix() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let s of streams) {
+        ctx.font = `${s.size}px "JetBrains Mono", monospace`;
+
+        for (let j = 0; j < s.length; j++) {
+          const charY = s.y - j * (s.size + 3);
+          if (charY < -20 || charY > canvas.height + 20) continue;
+
+          const ch = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+          const fade = (1 - j / s.length) * s.alpha;
+
+          if (j === 0) {
+            // Головной символ струи — яркий бело-зеленый неон
+            ctx.fillStyle = `rgba(220, 255, 170, ${ Math.min(1, s.alpha + 0.35) })`;
+          } else {
+            ctx.fillStyle = `rgba(158, 255, 0, ${fade})`;
+          }
+          ctx.fillText(ch, s.x, charY);
+        }
+
+        s.y += s.speed * 2.4;
+        if (s.y - s.length * s.size > canvas.height) {
+          s.y = Math.random() * -200;
+        }
+      }
+
+      requestAnimationFrame(drawMatrix);
+    }
+    drawMatrix();
+
+    // === 6. ПЕЧАТАЮЩИЕСЯ ASCII-ТЕРМИНАЛЫ (ВБЛИЗИ И ВДАЛИ С ОПТИЧЕСКИМ БЛЮРОМ) ===
     const asciiLayer = document.getElementById('asciiBgLayer');
 
     const asciiSnippets = [
 ` /\\___/\\
 (  o.o  )
  >  ^  <
-[aezakmi.node]`,
+[aezakmi.node: active]`,
 
 `packet.send(x008a4f2x)
 ├── decrypt(payload.deep)
 └── status: 0x01_ONLINE`,
 
-`   +---+
-  /   /|
- +---+ +
- |   |/
- +---+
-mesh_v4.obj`,
+`   +------+
+  /      /|
+ +------+ +
+ |      |/
+ +------+
+mesh_v4.obj // 60fps`,
 
 `fn describe(&self) -> String {
   impl Moment { <time.h> }
-  fps: 60 // 3840x2160
+  res: 3840x2160
 }`,
 
 `console.log("signal.lost")
 >> evade.loop(true)
->> mask_identity(hex)`,
+>> mask_identity(0x001de11x)`,
 
 `[x007e9d8x] scanning...
-████████▒▒ 82%
-layer_index: ASC`,
-
-`  .  *  .
- *  /\\  *
-   /  \\
-  '----'
-shader_init()`
+██████████▒▒ 88%
+layer_index: ASC_ MATRIX`
     ];
 
     function spawnTypingAscii() {
+      // Ограничиваем до 6 одновременных блоков, чтобы не перегружать экран
+      if (asciiLayer.children.length >= 6) return;
+
       const node = document.createElement('div');
       node.className = 'ascii-floating-node typing';
 
-      // Выбираем глубину: true = вблизи (крупнее и ярче), false = вдали (мельче и тусклее)
-      const isNear = Math.random() > 0.55;
-      const scale = isNear ? (0.95 + Math.random() * 0.35) : (0.55 + Math.random() * 0.25);
-      const opacity = isNear ? (0.42 + Math.random() * 0.22) : (0.16 + Math.random() * 0.14);
-      const extraBlur = isNear ? '0px' : '1.5px';
+      // Выбираем план: ВБЛИЗИ (крупный, четкий, яркий) или ВДАЛИ (мелкий и в блюре)
+      const isNear = Math.random() > 0.45;
+      const scale = isNear ? (1.0 + Math.random() * 0.25) : (0.65 + Math.random() * 0.2);
+      const opacity = isNear ? 0.88 : 0.45;
+      const blurAmount = isNear ? '0.4px' : '2.4px';
 
-      // Случайная позиция по краям и фону экрана
-      const posX = 5 + Math.random() * 82;
-      const posY = 8 + Math.random() * 80;
+      // Размещаем ближе к левому или правому краю, чтобы они красиво обрамляли карточку
+      const side = Math.random() > 0.5 ? 'left' : 'right';
+      const posX = side === 'left' ? (3 + Math.random() * 22) : (68 + Math.random() * 20);
+      const posY = 8 + Math.random() * 78;
 
       node.style.left = `${posX}%`;
       node.style.top = `${posY}%`;
       node.style.fontSize = '12px';
       node.style.opacity = opacity;
-      node.style.filter = `blur(${extraBlur})`;
+      node.style.filter = `blur(${blurAmount})`;
       node.style.transform = `scale(${scale})`;
 
       asciiLayer.appendChild(node);
@@ -834,27 +909,26 @@ shader_init()`
       const fullText = asciiSnippets[Math.floor(Math.random() * asciiSnippets.length)];
       let charIndex = 0;
 
-      // Посимвольная печать как в терминале
       const typeTimer = setInterval(() => {
         charIndex++;
         node.textContent = fullText.slice(0, charIndex);
 
         if (charIndex >= fullText.length) {
           clearInterval(typeTimer);
-          // Держим напечатанный блок пару секунд и плавно растворяем
           setTimeout(() => {
             node.classList.remove('typing');
             node.style.opacity = '0';
-            setTimeout(() => node.remove(), 1900);
-          }, 3200 + Math.random() * 2500);
+            setTimeout(() => node.remove(), 1200);
+          }, 2600 + Math.random() * 1800);
         }
-      }, 28 + Math.random() * 22);
+      }, 22 + Math.random() * 18);
     }
 
-    // Запускаем стартовые ASCII-блоки сразу и затем каждые 3.5 секунды печатаем новые
+    // Спавним сразу 3 блока на старте и затем каждые 1.3 секунды допечатываем новые
     spawnTypingAscii();
-    setTimeout(spawnTypingAscii, 1400);
-    setInterval(spawnTypingAscii, 3500);
+    setTimeout(spawnTypingAscii, 400);
+    setTimeout(spawnTypingAscii, 900);
+    setInterval(spawnTypingAscii, 1300);
   </script>
 </body>
 </html>
