@@ -37,7 +37,6 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* === 1. ОПТИМИЗИРОВАННАЯ СЦЕНА ФОНА С АБСТРАКТНОЙ ФИГУРОЙ === */
     .viewport-bg {
       position: fixed;
       top: 0;
@@ -50,7 +49,6 @@
       pointer-events: none;
     }
 
-    /* Абстрактная фигура красиво вписана в центр через радиальную маску */
     .bg-wrapper {
       position: absolute;
       inset: -6%;
@@ -59,7 +57,6 @@
       z-index: 0;
       pointer-events: none;
       will-change: transform;
-      /* Мягкое растворение краев видео в черный фон */
       -webkit-mask-image: radial-gradient(circle at 50% 44%, rgba(0,0,0,1) 15%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0) 82%);
       mask-image: radial-gradient(circle at 50% 44%, rgba(0,0,0,1) 15%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0) 82%);
     }
@@ -74,7 +71,6 @@
       transform: translateZ(0);
     }
 
-    /* Легкое атмосферное тонирование без тяжелого двойного блюра */
     .bg-overlay {
       position: absolute;
       inset: 0;
@@ -85,7 +81,6 @@
       pointer-events: none;
     }
 
-    /* === 2. СЛОЙ ПЕЧАТАЮЩИХСЯ ASCII-БЛОКОВ (БЕЗ НАЛОЖЕНИЙ ДРУГ НА ДРУГА) === */
     .ascii-bg-layer {
       position: absolute;
       inset: 0;
@@ -126,7 +121,6 @@
       50% { opacity: 0; }
     }
 
-    /* Минималистичная микро-сетка */
     .cyber-grid {
       position: absolute;
       inset: 0;
@@ -138,7 +132,6 @@
       pointer-events: none;
     }
 
-    /* === ВЕРХНЯЯ ТЕЛЕМЕТРИЯ (HUD) === */
     .hud-bar {
       position: fixed;
       top: 22px;
@@ -191,7 +184,6 @@
       gap: 48px;
     }
 
-    /* === МИНИМАЛИСТИЧНАЯ LIQUID GLASS КАРТОЧКА === */
     .liquid-card-scene {
       perspective: 1100px;
       display: flex;
@@ -250,7 +242,6 @@
       transform: translateZ(22px);
     }
 
-    /* === БЕЛАЯ МИНИМАЛИСТИЧНАЯ ПЛАШКА С ЧЕРНОЙ НАДПИСЬЮ AEZAKMI И ТЕМНОЙ ЗВЕЗДОЙ === */
     .minimal-white-pill {
       display: inline-flex;
       align-items: center;
@@ -324,7 +315,6 @@
       line-height: 1.15;
     }
 
-    /* === КНОПКИ СОЦСЕТЕЙ === */
     .social-dock {
       display: flex;
       gap: 10px;
@@ -370,7 +360,6 @@
       letter-spacing: 0.06em;
     }
 
-    /* === СЕКЦИЯ ВИТРИНЫ РАБОТ (ОПТИМИЗИРОВАННАЯ) === */
     .showcase-section {
       width: 100%;
       max-width: 940px;
@@ -457,10 +446,8 @@
 </head>
 <body>
 
-  <!-- 1. ФОНОВАЯ СЦЕНА: АБСТРАКТНАЯ ФИГУРА С МЯГКИМ НАЛОЖЕНИЕМ + ПЛАШКИ ASCII -->
   <div class="viewport-bg">
     <div class="bg-wrapper" id="bgWrapper">
-      <!-- poster="work1.jpg" дает мгновенную отрисовку до подгрузки видео -->
       <video 
         class="bg-video" 
         src="bg.mp4" 
@@ -477,13 +464,11 @@
 
     <div class="bg-overlay"></div>
 
-    <!-- Слой печатающихся зеленых плашек (по слотам без наложений) -->
     <div class="ascii-bg-layer" id="asciiBgLayer"></div>
 
     <div class="cyber-grid"></div>
   </div>
 
-  <!-- 2. ВЕРХНИЙ HUD -->
   <header class="hud-bar">
     <div>data_stream: [x002a9f4x]</div>
     <div class="hud-status">
@@ -492,14 +477,12 @@
     </div>
   </header>
 
-  <!-- 3. ЦЕНТРАЛЬНАЯ МИНИМАЛИСТИЧНАЯ КАРТОЧКА -->
   <main>
     <div class="liquid-card-scene">
       <div class="liquid-glass-card" id="liquidCard">
         <div class="liquid-glare" id="liquidGlare"></div>
 
         <div class="card-content">
-          <!-- Белая минималистичная капсула посередине: маленький черный aezakmi + черная звездочка -->
           <div class="minimal-white-pill" title="aezakmi visual mark">
             <span class="brand-name-dark">aezakmi</span>
             <svg class="black-sparkles-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -539,7 +522,7 @@
             </a>
           </div>
 
-          <div class="hint-drag">[ Нажми и потяни — мягкая физика активна ]</div>
+          <div class="hint-drag"></div>
         </div>
       </div>
     </div>
