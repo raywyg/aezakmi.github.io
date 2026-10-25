@@ -4,14 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>aezakmi — visual & motion archive</title>
-  <!-- Подключаем техно-геометрический шрифт Chakra Petch, кодовый Space Mono и пиксельный Silkscreen под стиль HUD aezakmi -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Silkscreen&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      /* Выверенная светлая лабораторная палитра по референсам aezakmi */
       --bg-lab: #f2f4f8;
       --bg-paper: #ffffff;
       --ink-main: #090b10;
@@ -70,7 +68,6 @@
       mask-image: radial-gradient(circle at 50% 42%, rgba(0,0,0,1) 12%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0) 82%);
     }
 
-    /* На светлом фоне видео работает как чистая цветная проекция */
     .bg-video {
       width: 100%;
       height: 100%;
@@ -93,7 +90,6 @@
       pointer-events: none;
     }
 
-    /* Декоративные орбиты из 1-й работы aezakmi (data_stream) */
     .hud-orbit-svg {
       position: absolute;
       top: 50%;
@@ -112,7 +108,7 @@
       to { transform: translate(-50%, -52%) rotate(360deg); }
     }
 
-    /* === 2. ПЕЧАТАЮЩИЕСЯ ТЕРМИНАЛЬНЫЕ ПЛАШКИ (В СВЕТЛОМ ЛАБОРАТОРНОМ СТИЛЕ) === */
+    /* === 2. ПЕЧАТАЮЩИЕСЯ ТЕРМИНАЛЬНЫЕ ПЛАШКИ === */
     .ascii-bg-layer {
       position: absolute;
       inset: 0;
@@ -156,7 +152,6 @@
       50% { opacity: 0; }
     }
 
-    /* Тонкая инженерная сетка */
     .cyber-grid {
       position: absolute;
       inset: 0;
@@ -244,7 +239,7 @@
       gap: 54px;
     }
 
-    /* === ЦЕНТРАЛЬНАЯ КАРТОЧКА (FROSTED TITANIUM LIQUID GLASS) === */
+    /* === ЦЕНТРАЛЬНАЯ КАРТОЧКА === */
     .liquid-card-scene {
       perspective: 1200px;
       display: flex;
@@ -283,7 +278,6 @@
       cursor: grabbing;
     }
 
-    /* Инженерные прицелы (+) по углам карточки в стиле рендеров aezakmi */
     .corner-cross {
       position: absolute;
       font-family: 'Space Mono', monospace;
@@ -320,7 +314,6 @@
       transform: translateZ(24px);
     }
 
-    /* === НОВАЯ ТИПОГРАФИКА AEZAKMI БЕЗ БЕЛОЙ КНОПКИ-КАПСУЛЫ === */
     .identity-header {
       position: relative;
       display: inline-flex;
@@ -343,7 +336,6 @@
       margin-top: 6px;
     }
 
-    /* Главный никнейм: техно-шрифт Chakra Petch с острыми гранями */
     .brand-title {
       font-family: 'Chakra Petch', sans-serif;
       font-weight: 700;
@@ -361,7 +353,6 @@
       color: var(--hyper-blue);
     }
 
-    /* Та самая 5-я фигура — уменьшенная черная звезда, стоящая свободно без кнопки */
     .black-sparkles-svg {
       width: 28px;
       height: 28px;
@@ -400,7 +391,6 @@
       background: var(--acid-lime);
     }
 
-    /* ТЕРМИНАЛ С КОТОМ В СВЕТЛОЙ ИНЖЕНЕРНОЙ ОПРАВЕ */
     .ascii-terminal {
       width: 100%;
       max-width: 340px;
@@ -498,7 +488,7 @@
       transition: fill 0.2s ease;
     }
 
-    /* === 4. СЕКЦИЯ ВИТРИНЫ РАБОТ (ARCHIVE SHOWCASE) === */
+    /* === 4. СЕКЦИЯ ВИТРИНЫ РАБОТ === */
     .showcase-section {
       width: 100%;
       max-width: 960px;
@@ -633,7 +623,6 @@
 </head>
 <body>
 
-  <!-- 1. СВЕТЛАЯ ГОЛОГРАФИЧЕСКАЯ СЦЕНА ФОНА -->
   <div class="viewport-bg">
     <div class="bg-wrapper" id="bgWrapper">
       <video 
@@ -652,7 +641,6 @@
 
     <div class="bg-overlay"></div>
 
-    <!-- Векторные пунктирные орбиты в стиле работ aezakmi -->
     <svg class="hud-orbit-svg" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="300" cy="300" r="240" stroke="#090b10" stroke-width="1" stroke-dasharray="6 8" />
       <circle cx="300" cy="300" r="175" stroke="#0033ff" stroke-width="0.75" stroke-Opacity="0.5" />
@@ -663,12 +651,9 @@
     </svg>
 
     <div class="cyber-grid"></div>
-
-    <!-- Слой печатающихся лабораторных терминалов -->
     <div class="ascii-bg-layer" id="asciiBgLayer"></div>
   </div>
 
-  <!-- 2. ВЕРХНИЙ ТЕХНИЧЕСКИЙ HUD -->
   <header class="hud-bar">
     <div class="hud-coord">
       <b>SYS_01</b>
@@ -680,11 +665,9 @@
     </div>
   </header>
 
-  <!-- 3. ГЛАВНАЯ СЦЕНА -->
   <main>
     <div class="liquid-card-scene">
       <div class="liquid-glass-card" id="liquidCard">
-        <!-- Угловые перекрестия (+) -->
         <span class="corner-cross tl">+</span>
         <span class="corner-cross tr">+</span>
         <span class="corner-cross bl">+</span>
@@ -693,7 +676,6 @@
         <div class="liquid-glare" id="liquidGlare"></div>
 
         <div class="card-content">
-          <!-- ЧИСТЫЙ ЗАГОЛОВОК AEZAKMI БЕЗ БЕЛОЙ КНОПКИ + ЧЕРНАЯ ЗВЕЗДА -->
           <div class="identity-header">
             <span class="index-tag">0x01</span>
             <h1 class="brand-title" id="glitchTitle" data-text="aezakmi">aezakmi</h1>
@@ -743,7 +725,7 @@
       </div>
     </div>
 
-    <!-- 4. ВИТРИНА РАБОТ (С УМНОЙ ПОДГРУЗКОЙ И ЗАЩИТОЙ) -->
+    <!-- 4. ВИТРИНА РАБОТ -->
     <section class="showcase-section">
       <div class="showcase-header">
         <span class="showcase-title">// SELECTED_WORKS [04]</span>
@@ -826,7 +808,7 @@
   </main>
 
   <script>
-    // === 1. ЖЕСТКАЯ ЗАЩИТА КОНТЕНТА (БЕЗ ИЗМЕНЕНИЙ, КАК ТЫ ПРОСИЛ) ===
+    // === 1. ЖЕСТКАЯ ЗАЩИТА КОНТЕНТА ===
     document.addEventListener('contextmenu', e => e.preventDefault());
     document.addEventListener('dragstart', e => e.preventDefault());
     document.addEventListener('keydown', e => {
@@ -839,7 +821,7 @@
       }
     });
 
-    // === 2. ИНТЕРАКТИВНЫЙ КИБЕР-ДЕКОДЕР НА ЗАГОЛОВКЕ AEZAKMI ===
+    // === 2. ИНТЕРАКТИВНЫЙ КИБЕР-ДЕКОДЕР (ЗАМЕДЛЕННЫЙ) ===
     const titleEl = document.getElementById('glitchTitle');
     const glyphPool = 'aezakmi01X#/_+*';
     let decodeInterval = null;
@@ -848,20 +830,23 @@
       let step = 0;
       const original = titleEl.dataset.text;
       clearInterval(decodeInterval);
+      
       decodeInterval = setInterval(() => {
         titleEl.textContent = original
           .split('')
           .map((char, idx) => (idx < step ? original[idx] : glyphPool[Math.floor(Math.random() * glyphPool.length)]))
           .join('');
-        step += 0.45;
+        
+        step += 0.15; 
+        
         if (step >= original.length) {
           titleEl.textContent = original;
           clearInterval(decodeInterval);
         }
-      }, 30);
+      }, 45); 
     });
 
-    // === 3. КОМФОРТНАЯ ГРОМКОСТЬ (22%) И УМНЫЙ ЗАПУСК ВИДЕО ПРИ СКРОЛЛЕ ===
+    // === 3. КОМФОРТНАЯ ГРОМКОСТЬ (22%) И УМНЫЙ ЗАПУСК ВИДЕО ===
     const DEFAULT_VOLUME = 0.22;
     document.querySelectorAll('video').forEach(vid => {
       vid.volume = DEFAULT_VOLUME;
@@ -908,19 +893,12 @@
     const bgWrapper = document.getElementById('bgWrapper');
 
     let state = {
-      rotX: 0, rotY: 0,
-      targetRotX: 0, targetRotY: 0,
-      velRotX: 0, velRotY: 0,
-      posX: 0, posY: 0,
-      targetPosX: 0, targetPosY: 0,
-      velPosX: 0, velPosY: 0,
-      isDragging: false,
-      startX: 0, startY: 0
+      rotX: 0, rotY: 0, targetRotX: 0, targetRotY: 0,
+      velRotX: 0, velRotY: 0, posX: 0, posY: 0, targetPosX: 0, targetPosY: 0,
+      velPosX: 0, velPosY: 0, isDragging: false, startX: 0, startY: 0
     };
 
-    const stiffness = 0.055;
-    const damping = 0.82;
-    const maxDragDist = 32;
+    const stiffness = 0.055, damping = 0.82, maxDragDist = 32;
 
     window.addEventListener('pointermove', (e) => {
       const normX = (e.clientX / window.innerWidth) - 0.5;
@@ -946,7 +924,7 @@
     }, { passive: true });
 
     card.addEventListener('pointerdown', (e) => {
-      if (e.target.closest('a')) return;
+      if (e.target.closest('a') || e.target.closest('.sound-btn')) return;
       state.isDragging = true;
       state.startX = e.clientX - (state.targetPosX / 0.16);
       state.startY = e.clientY - (state.targetPosY / 0.16);
@@ -962,16 +940,13 @@
     function animatePhysics() {
       state.velRotX = (state.velRotX + (state.targetRotX - state.rotX) * stiffness) * damping;
       state.velRotY = (state.velRotY + (state.targetRotY - state.rotY) * stiffness) * damping;
-      state.rotX += state.velRotX;
-      state.rotY += state.velRotY;
+      state.rotX += state.velRotX; state.rotY += state.velRotY;
 
       state.velPosX = (state.velPosX + (state.targetPosX - state.posX) * stiffness) * damping;
       state.velPosY = (state.velPosY + (state.targetPosY - state.posY) * stiffness) * damping;
-      state.posX += state.velPosX;
-      state.posY += state.velPosY;
+      state.posX += state.velPosX; state.posY += state.velPosY;
 
       card.style.transform = `translate3d(${state.posX.toFixed(2)}px, ${state.posY.toFixed(2)}px, 0) rotateX(${state.rotX.toFixed(2)}deg) rotateY(${state.rotY.toFixed(2)}deg)`;
-
       requestAnimationFrame(animatePhysics);
     }
     animatePhysics();
@@ -1001,7 +976,7 @@
       });
     });
 
-    // === 6. СИСТЕМА ПЕЧАТАЮЩИХСЯ ПЛАШЕК ПО СЛОТАМ (БЕЗ НАЛОЖЕНИЙ) ===
+    // === 6. СИСТЕМА ПЕЧАТАЮЩИХСЯ ПЛАШЕК ПО СЛОТАМ ===
     const asciiLayer = document.getElementById('asciiBgLayer');
 
     const slots = [
