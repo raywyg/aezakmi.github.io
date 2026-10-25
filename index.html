@@ -3,18 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>aezakmi — visual & motion</title>
+  <title>aezakmi — visual & motion archive</title>
+  <!-- Подключаем техно-геометрический шрифт Chakra Petch, кодовый Space Mono и пиксельный Silkscreen под стиль HUD aezakmi -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Silkscreen&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --glass-border: rgba(255, 255, 255, 0.12);
-      --glass-highlight: rgba(255, 255, 255, 0.25);
-      --acid-green: #9eff00;
-      --text-main: #f5f7fa;
-      --text-muted: rgba(245, 247, 250, 0.48);
+      /* Выверенная светлая лабораторная палитра по референсам aezakmi */
+      --bg-lab: #f2f4f8;
+      --bg-paper: #ffffff;
+      --ink-main: #090b10;
+      --ink-secondary: #4a5160;
+      --ink-muted: rgba(9, 11, 16, 0.42);
+      --acid-lime: #8be800;
+      --acid-lime-Bright: #a4ff00;
+      --hyper-blue: #0033ff;
+      --glass-surface: rgba(255, 255, 255, 0.68);
+      --glass-border: rgba(9, 11, 16, 0.09);
+      --glass-highlight: rgba(255, 255, 255, 0.95);
     }
 
     * {
@@ -29,14 +37,15 @@
     html, body {
       width: 100%;
       min-height: 100%;
-      background-color: #040507 !important;
-      color: var(--text-main);
-      font-family: 'JetBrains Mono', monospace;
+      background-color: var(--bg-lab) !important;
+      color: var(--ink-main);
+      font-family: 'Space Mono', monospace;
       overflow-x: hidden;
       overscroll-behavior: none;
       -webkit-font-smoothing: antialiased;
     }
 
+    /* === 1. СВЕТЛАЯ ГОЛОГРАФИЧЕСКАЯ СЦЕНА ФОНА === */
     .viewport-bg {
       position: fixed;
       top: 0;
@@ -45,7 +54,7 @@
       height: 100dvh;
       z-index: 0;
       overflow: hidden;
-      background-color: #040507;
+      background-color: var(--bg-lab);
       pointer-events: none;
     }
 
@@ -57,16 +66,17 @@
       z-index: 0;
       pointer-events: none;
       will-change: transform;
-      -webkit-mask-image: radial-gradient(circle at 50% 44%, rgba(0,0,0,1) 15%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0) 82%);
-      mask-image: radial-gradient(circle at 50% 44%, rgba(0,0,0,1) 15%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0) 82%);
+      -webkit-mask-image: radial-gradient(circle at 50% 42%, rgba(0,0,0,1) 12%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0) 82%);
+      mask-image: radial-gradient(circle at 50% 42%, rgba(0,0,0,1) 12%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0) 82%);
     }
 
+    /* На светлом фоне видео работает как чистая цветная проекция */
     .bg-video {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      opacity: 0.42;
-      filter: contrast(1.12) saturate(1.1) brightness(0.8);
+      opacity: 0.34;
+      filter: contrast(1.18) saturate(1.25) brightness(1.06);
       pointer-events: none;
       transform: translateZ(0);
     }
@@ -76,15 +86,37 @@
       inset: 0;
       z-index: 1;
       background: 
-        radial-gradient(circle at 50% 42%, rgba(10, 14, 18, 0.35) 0%, rgba(4, 5, 7, 0.92) 85%),
-        linear-gradient(180deg, rgba(4, 5, 7, 0.25) 0%, rgba(4, 5, 7, 0.9) 100%);
+        radial-gradient(circle at 50% 40%, rgba(242, 244, 248, 0.35) 0%, rgba(242, 244, 248, 0.94) 82%),
+        linear-gradient(180deg, rgba(242, 244, 248, 0.25) 0%, rgba(242, 244, 248, 0.96) 100%);
+      backdrop-filter: blur(10px) saturate(140%);
+      -webkit-backdrop-filter: blur(10px) saturate(140%);
       pointer-events: none;
     }
 
+    /* Декоративные орбиты из 1-й работы aezakmi (data_stream) */
+    .hud-orbit-svg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: min(860px, 94vw);
+      height: min(860px, 94vw);
+      transform: translate(-50%, -52%);
+      z-index: 2;
+      opacity: 0.28;
+      pointer-events: none;
+      animation: slowSpin 90s linear infinite;
+    }
+
+    @keyframes slowSpin {
+      from { transform: translate(-50%, -52%) rotate(0deg); }
+      to { transform: translate(-50%, -52%) rotate(360deg); }
+    }
+
+    /* === 2. ПЕЧАТАЮЩИЕСЯ ТЕРМИНАЛЬНЫЕ ПЛАШКИ (В СВЕТЛОМ ЛАБОРАТОРНОМ СТИЛЕ) === */
     .ascii-bg-layer {
       position: absolute;
       inset: 0;
-      z-index: 2;
+      z-index: 3;
       pointer-events: none;
       overflow: hidden;
     }
@@ -92,27 +124,30 @@
     .ascii-floating-node {
       position: absolute;
       white-space: pre;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--acid-green);
+      font-family: 'Space Mono', monospace;
+      color: var(--ink-main);
       font-weight: 400;
-      font-size: 11px;
-      line-height: 1.3;
-      letter-spacing: 0.03em;
+      font-size: 10.5px;
+      line-height: 1.35;
+      letter-spacing: 0.02em;
       pointer-events: none;
       will-change: opacity, transform;
       transition: opacity 0.9s ease;
-      text-shadow: 0 0 10px rgba(158, 255, 0, 0.45);
-      background: rgba(6, 9, 8, 0.55);
-      padding: 7px 11px;
-      border-left: 2px solid rgba(158, 255, 0, 0.6);
-      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.76);
+      padding: 8px 12px;
+      border-left: 3px solid var(--hyper-blue);
+      border-top: 1px solid rgba(9, 11, 16, 0.06);
+      border-right: 1px solid rgba(9, 11, 16, 0.06);
+      border-bottom: 1px solid rgba(9, 11, 16, 0.06);
+      border-radius: 4px;
+      box-shadow: 0 10px 24px rgba(9, 11, 16, 0.05);
     }
 
     .ascii-floating-node.typing::after {
       content: '▋';
       display: inline-block;
       margin-left: 3px;
-      color: #ffffff;
+      color: var(--hyper-blue);
       animation: blinkCursor 0.5s step-end infinite;
     }
 
@@ -121,54 +156,79 @@
       50% { opacity: 0; }
     }
 
+    /* Тонкая инженерная сетка */
     .cyber-grid {
       position: absolute;
       inset: 0;
-      z-index: 3;
+      z-index: 2;
       background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
-      background-size: 72px 72px;
+        linear-gradient(rgba(9, 11, 16, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(9, 11, 16, 0.035) 1px, transparent 1px);
+      background-size: 64px 64px;
       pointer-events: none;
     }
 
+    /* === ВЕРХНЯЯ ТЕЛЕМЕТРИЯ (HUD BAR) === */
     .hud-bar {
       position: fixed;
-      top: 22px;
-      left: 32px;
-      right: 32px;
+      top: 20px;
+      left: 28px;
+      right: 28px;
       z-index: 20;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-size: 11px;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      color: var(--ink-secondary);
       pointer-events: none;
+    }
+
+    .hud-coord {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.75);
+      border: 1px solid var(--glass-border);
+      padding: 6px 12px;
+      border-radius: 6px;
+      backdrop-filter: blur(10px);
+    }
+
+    .hud-coord b {
+      font-family: 'Silkscreen', monospace;
+      font-size: 10px;
+      color: var(--hyper-blue);
+      font-weight: 400;
     }
 
     .hud-status {
       display: flex;
       align-items: center;
       gap: 8px;
-      background: rgba(12, 15, 20, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid var(--glass-border);
+      padding: 6px 14px;
       border-radius: 999px;
+      box-shadow: 0 4px 14px rgba(9, 11, 16, 0.04);
+      backdrop-filter: blur(10px);
+      color: var(--ink-main);
+      font-weight: 700;
     }
 
     .status-dot {
-      width: 6px;
-      height: 6px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
-      background: var(--acid-green);
-      box-shadow: 0 0 8px var(--acid-green);
+      background: var(--acid-lime);
+      box-shadow: 0 0 10px var(--acid-lime);
+      border: 1px solid rgba(9, 11, 16, 0.25);
       animation: pulse 2.2s infinite;
     }
 
     @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.82); opacity: 0.45; }
     }
 
     /* === ОСНОВНОЙ КОНТЕЙНЕР === */
@@ -180,35 +240,38 @@
       align-items: center;
       justify-content: center;
       min-height: 100dvh;
-      padding: 100px 20px 80px;
-      gap: 48px;
+      padding: 96px 20px 80px;
+      gap: 54px;
     }
 
+    /* === ЦЕНТРАЛЬНАЯ КАРТОЧКА (FROSTED TITANIUM LIQUID GLASS) === */
     .liquid-card-scene {
-      perspective: 1100px;
+      perspective: 1200px;
       display: flex;
       justify-content: center;
       align-items: center;
       width: 100%;
-      max-width: 440px;
+      max-width: 480px;
     }
 
     .liquid-glass-card {
       position: relative;
       width: 100%;
-      padding: 38px 32px 32px;
-      border-radius: 32px;
+      padding: 42px 36px 34px;
+      border-radius: 28px;
       background: linear-gradient(
         145deg,
-        rgba(20, 23, 29, 0.62) 0%,
-        rgba(9, 11, 15, 0.52) 100%
+        rgba(255, 255, 255, 0.84) 0%,
+        rgba(245, 247, 252, 0.64) 100%
       );
-      backdrop-filter: blur(20px) saturate(160%);
-      -webkit-backdrop-filter: blur(20px) saturate(160%);
-      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid rgba(9, 11, 16, 0.1);
       box-shadow:
-        0 24px 50px rgba(0, 0, 0, 0.65),
-        inset 0 1px 0 var(--glass-highlight);
+        0 28px 60px rgba(9, 11, 16, 0.08),
+        0 4px 16px rgba(9, 11, 16, 0.04),
+        inset 0 1px 0 #ffffff,
+        inset 0 0 0 1px rgba(255, 255, 255, 0.6);
       transform-style: preserve-3d;
       cursor: grab;
       will-change: transform;
@@ -220,13 +283,28 @@
       cursor: grabbing;
     }
 
+    /* Инженерные прицелы (+) по углам карточки в стиле рендеров aezakmi */
+    .corner-cross {
+      position: absolute;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: rgba(9, 11, 16, 0.28);
+      line-height: 1;
+      pointer-events: none;
+    }
+    .corner-cross.tl { top: 14px; left: 16px; }
+    .corner-cross.tr { top: 14px; right: 16px; }
+    .corner-cross.bl { bottom: 14px; left: 16px; }
+    .corner-cross.br { bottom: 14px; right: 16px; }
+
     .liquid-glare {
       position: absolute;
       inset: -50%;
       background: radial-gradient(
         circle at var(--glare-x, 50%) var(--glare-y, 50%),
-        rgba(255, 255, 255, 0.14) 0%,
-        transparent 55%
+        rgba(255, 255, 255, 0.9) 0%,
+        rgba(139, 232, 0, 0.12) 28%,
+        transparent 60%
       );
       pointer-events: none;
       z-index: 0;
@@ -239,82 +317,141 @@
       flex-direction: column;
       align-items: center;
       text-align: center;
-      transform: translateZ(22px);
+      transform: translateZ(24px);
     }
 
-    .minimal-white-pill {
+    /* === НОВАЯ ТИПОГРАФИКА AEZAKMI БЕЗ БЕЛОЙ КНОПКИ-КАПСУЛЫ === */
+    .identity-header {
+      position: relative;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      background: #ffffff;
-      color: #07080a;
-      padding: 9px 20px 9px 22px;
-      border-radius: 999px;
-      box-shadow: 
-        0 10px 28px rgba(255, 255, 255, 0.14),
-        inset 0 -1px 2px rgba(0, 0, 0, 0.12);
-      margin-bottom: 14px;
-      transform: translateZ(16px);
-      transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.3), box-shadow 0.3s ease;
+      gap: 12px;
+      margin-bottom: 8px;
+      transform: translateZ(18px);
     }
 
-    .liquid-glass-card:hover .minimal-white-pill {
-      transform: translateZ(26px) scale(1.03);
-      box-shadow: 0 14px 34px rgba(255, 255, 255, 0.22);
+    .index-tag {
+      font-family: 'Silkscreen', monospace;
+      font-size: 10px;
+      color: var(--hyper-blue);
+      background: rgba(0, 51, 255, 0.08);
+      border: 1px solid rgba(0, 51, 255, 0.2);
+      padding: 3px 6px;
+      border-radius: 4px;
+      align-self: flex-start;
+      margin-top: 6px;
     }
 
-    .brand-name-dark {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 1.35rem;
+    /* Главный никнейм: техно-шрифт Chakra Petch с острыми гранями */
+    .brand-title {
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: clamp(2.5rem, 6.5vw, 3.4rem);
       letter-spacing: -0.03em;
-      color: #07080a;
-      line-height: 1;
+      text-transform: lowercase;
+      color: var(--ink-main);
+      line-height: 0.95;
+      position: relative;
+      cursor: pointer;
+      transition: color 0.2s ease;
     }
 
+    .brand-title:hover {
+      color: var(--hyper-blue);
+    }
+
+    /* Та самая 5-я фигура — уменьшенная черная звезда, стоящая свободно без кнопки */
     .black-sparkles-svg {
-      width: 20px;
-      height: 20px;
-      fill: #07080a;
+      width: 28px;
+      height: 28px;
+      fill: var(--ink-main);
       flex-shrink: 0;
-      transition: transform 0.35s ease;
+      filter: drop-shadow(0 4px 10px rgba(9, 11, 16, 0.14));
+      transition: transform 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.4), fill 0.25s ease;
     }
 
     .liquid-glass-card:hover .black-sparkles-svg {
-      transform: rotate(12deg) scale(1.1);
+      transform: rotate(18deg) scale(1.12);
     }
 
     .brand-subtitle {
       font-size: 10.5px;
-      color: var(--text-muted);
+      color: var(--ink-secondary);
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
+    .subtitle-Squares {
+      display: inline-flex;
+      gap: 3px;
+    }
+    .subtitle-Squares i {
+      width: 5px;
+      height: 5px;
+      background: var(--ink-main);
+      display: inline-block;
+    }
+    .subtitle-Squares i:last-child {
+      background: var(--acid-lime);
+    }
+
+    /* ТЕРМИНАЛ С КОТОМ В СВЕТЛОЙ ИНЖЕНЕРНОЙ ОПРАВЕ */
     .ascii-terminal {
+      width: 100%;
+      max-width: 340px;
       font-size: 10.5px;
-      line-height: 1.35;
-      color: rgba(255, 255, 255, 0.72);
-      background: rgba(0, 0, 0, 0.42);
-      border: 1px solid rgba(255, 255, 255, 0.07);
+      line-height: 1.4;
+      color: var(--ink-secondary);
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(9, 11, 16, 0.09);
       border-radius: 14px;
-      padding: 9px 16px;
+      padding: 11px 16px;
       margin-bottom: 24px;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 12px;
       text-align: left;
+      box-shadow: inset 0 1px 4px rgba(9, 11, 16, 0.03);
     }
 
     .ascii-cat {
       white-space: pre;
       font-size: 9.5px;
-      color: var(--acid-green);
+      color: var(--ink-main);
+      font-weight: 700;
       line-height: 1.15;
+      padding-right: 12px;
+      border-right: 1px dashed rgba(9, 11, 16, 0.15);
     }
 
+    .terminal-meta {
+      flex: 1;
+    }
+
+    .terminal-scan {
+      color: var(--ink-main);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .scan-badge {
+      background: var(--acid-lime-Bright);
+      color: var(--ink-main);
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-weight: 700;
+    }
+
+    /* === КНОПКИ СОЦСЕТЕЙ === */
     .social-dock {
       display: flex;
       gap: 10px;
@@ -329,70 +466,99 @@
       align-items: center;
       gap: 8px;
       padding: 11px 18px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.13);
-      color: #ffffff;
+      border-radius: 12px;
+      background: #ffffff;
+      border: 1px solid rgba(9, 11, 16, 0.11);
+      color: var(--ink-main);
       text-decoration: none;
-      font-size: 11.5px;
-      font-weight: 500;
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
       letter-spacing: 0.03em;
-      transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 12px rgba(9, 11, 16, 0.04);
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
       will-change: transform;
     }
 
     .magnetic-btn:hover {
-      background: rgba(255, 255, 255, 0.13);
-      border-color: rgba(158, 255, 0, 0.55);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35), 0 0 14px rgba(158, 255, 0, 0.15);
+      background: var(--ink-main);
+      color: #ffffff;
+      border-color: var(--ink-main);
+      box-shadow: 0 10px 22px rgba(9, 11, 16, 0.16);
+    }
+
+    .magnetic-btn:hover svg {
+      fill: var(--acid-lime-Bright);
     }
 
     .magnetic-btn svg {
       width: 14px;
       height: 14px;
       fill: currentColor;
+      transition: fill 0.2s ease;
     }
 
-    .hint-drag {
-      margin-top: 18px;
-      font-size: 9.5px;
-      color: rgba(255, 255, 255, 0.28);
-      letter-spacing: 0.06em;
-    }
-
+    /* === 4. СЕКЦИЯ ВИТРИНЫ РАБОТ (ARCHIVE SHOWCASE) === */
     .showcase-section {
       width: 100%;
-      max-width: 940px;
+      max-width: 960px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 18px;
     }
 
     .showcase-header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-end;
-      padding: 0 6px;
+      align-items: center;
+      padding: 8px 14px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
       font-size: 11px;
-      color: var(--text-muted);
+      color: var(--ink-secondary);
+      backdrop-filter: blur(8px);
+    }
+
+    .showcase-title {
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--ink-main);
+      letter-spacing: 0.08em;
     }
 
     .showcase-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
     }
 
     .work-card {
       position: relative;
-      border-radius: 20px;
+      border-radius: 18px;
       overflow: hidden;
-      background: #0b0d12;
-      border: 1px solid rgba(255, 255, 255, 0.11);
-      aspect-ratio: 16 / 9;
+      background: #ffffff;
+      border: 1px solid rgba(9, 11, 16, 0.1);
+      padding: 6px;
+      aspect-ratio: 16 / 9.6;
       will-change: transform;
-      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.45);
-      transition: transform 0.25s ease;
+      box-shadow: 0 16px 36px rgba(9, 11, 16, 0.07);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+    .work-card:hover {
+      border-color: var(--hyper-blue);
+      box-shadow: 0 22px 44px rgba(0, 51, 255, 0.1);
+    }
+
+    .work-media-wrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 13px;
+      overflow: hidden;
+      background: #e9edf2;
     }
 
     .work-card video,
@@ -408,44 +574,66 @@
     .work-hud {
       position: absolute;
       inset: 0;
-      padding: 12px 14px;
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      background: linear-gradient(180deg, rgba(0,0,0,0.45) 0%, transparent 45%, rgba(0,0,0,0.75) 100%);
+      background: linear-gradient(180deg, rgba(9,11,16,0.32) 0%, transparent 40%, rgba(9,11,16,0.68) 100%);
       font-size: 10.5px;
       z-index: 2;
+      color: #ffffff;
     }
 
     .work-tag {
       align-self: flex-start;
       padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(8, 10, 14, 0.78);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      color: #fff;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(9, 11, 16, 0.12);
+      color: var(--ink-main);
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
     }
 
     .sound-btn {
       pointer-events: auto;
       cursor: pointer;
-      transition: border-color 0.2s, color 0.2s;
+      transition: transform 0.15s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+    .sound-btn:hover {
+      background: var(--ink-main);
+      color: #ffffff;
     }
 
     .sound-btn.active {
-      border-color: var(--acid-green);
-      color: var(--acid-green);
+      background: var(--acid-lime-Bright);
+      color: var(--ink-main);
+      border-color: var(--ink-main);
+    }
+
+    .work-footer-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
     }
 
     @media (max-width: 600px) {
-      .hud-bar { left: 16px; right: 16px; top: 14px; }
-      .liquid-glass-card { padding: 30px 20px 24px; border-radius: 26px; }
-      .ascii-floating-node { font-size: 9.5px; padding: 5px 8px; }
+      .hud-bar { left: 14px; right: 14px; top: 12px; }
+      .liquid-glass-card { padding: 34px 20px 26px; border-radius: 22px; }
+      .ascii-floating-node { font-size: 9px; padding: 5px 8px; }
     }
   </style>
 </head>
 <body>
 
+  <!-- 1. СВЕТЛАЯ ГОЛОГРАФИЧЕСКАЯ СЦЕНА ФОНА -->
   <div class="viewport-bg">
     <div class="bg-wrapper" id="bgWrapper">
       <video 
@@ -464,28 +652,52 @@
 
     <div class="bg-overlay"></div>
 
-    <div class="ascii-bg-layer" id="asciiBgLayer"></div>
+    <!-- Векторные пунктирные орбиты в стиле работ aezakmi -->
+    <svg class="hud-orbit-svg" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="300" cy="300" r="240" stroke="#090b10" stroke-width="1" stroke-dasharray="6 8" />
+      <circle cx="300" cy="300" r="175" stroke="#0033ff" stroke-width="0.75" stroke-Opacity="0.5" />
+      <circle cx="300" cy="60" r="4" fill="#090b10" />
+      <circle cx="475" cy="300" r="3.5" fill="#0033ff" />
+      <line x1="300" y1="20" x2="300" y2="50" stroke="#090b10" stroke-width="1"/>
+      <line x1="300" y1="550" x2="300" y2="580" stroke="#090b10" stroke-width="1"/>
+    </svg>
 
     <div class="cyber-grid"></div>
+
+    <!-- Слой печатающихся лабораторных терминалов -->
+    <div class="ascii-bg-layer" id="asciiBgLayer"></div>
   </div>
 
+  <!-- 2. ВЕРХНИЙ ТЕХНИЧЕСКИЙ HUD -->
   <header class="hud-bar">
-    <div>data_stream: [x002a9f4x]</div>
+    <div class="hud-coord">
+      <b>SYS_01</b>
+      <span>data_stream: [x002a9f4x]</span>
+    </div>
     <div class="hud-status">
       <span class="status-dot"></span>
       <span>aezakmi.status: online</span>
     </div>
   </header>
 
+  <!-- 3. ГЛАВНАЯ СЦЕНА -->
   <main>
     <div class="liquid-card-scene">
       <div class="liquid-glass-card" id="liquidCard">
+        <!-- Угловые перекрестия (+) -->
+        <span class="corner-cross tl">+</span>
+        <span class="corner-cross tr">+</span>
+        <span class="corner-cross bl">+</span>
+        <span class="corner-cross br">+</span>
+
         <div class="liquid-glare" id="liquidGlare"></div>
 
         <div class="card-content">
-          <div class="minimal-white-pill" title="aezakmi visual mark">
-            <span class="brand-name-dark">aezakmi</span>
-            <svg class="black-sparkles-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <!-- ЧИСТЫЙ ЗАГОЛОВОК AEZAKMI БЕЗ БЕЛОЙ КНОПКИ + ЧЕРНАЯ ЗВЕЗДА -->
+          <div class="identity-header">
+            <span class="index-tag">0x01</span>
+            <h1 class="brand-title" id="glitchTitle" data-text="aezakmi">aezakmi</h1>
+            <svg class="black-sparkles-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-label="aezakmi star mark">
               <path d="M48 16 C48 41 41 48 16 48 C41 48 48 55 48 80 C48 55 55 48 80 48 C55 48 48 41 48 16 Z" />
               <path d="M26 8 C26 20 20 26 8 26 C20 26 26 32 26 44 C26 32 32 26 44 26 C32 26 26 20 26 8 Z" />
               <path d="M77 24 C77 33 71 39 62 39 C71 39 77 45 77 54 C77 45 83 39 92 39 C83 39 77 33 77 24 Z" />
@@ -493,14 +705,20 @@
             </svg>
           </div>
 
-          <p class="brand-subtitle">3D / Motion / Visual Architecture</p>
+          <p class="brand-subtitle">
+            <span class="subtitle-Squares"><i></i><i></i></span>
+            <span>3D / Motion / Visual Architecture</span>
+          </p>
 
           <div class="ascii-terminal">
             <div class="ascii-cat"> /\___/\
 (  o.o  )
  &gt;  ^  &lt;</div>
-            <div>
-              <div style="color: #9eff00;">[x007e9d8x] scanning...</div>
+            <div class="terminal-meta">
+              <div class="terminal-scan">
+                <span class="scan-badge">ACTIVE</span>
+                <span>[x007e9d8x]</span>
+              </div>
               <div>fps: 60 // 3840x2160</div>
             </div>
           </div>
@@ -521,68 +739,86 @@
               <span>TikTok</span>
             </a>
           </div>
-
-          <div class="hint-drag"></div>
         </div>
       </div>
     </div>
 
-    <!-- 4. ВИТРИНА РАБОТ (С УМНОЙ ПОДГРУЗКОЙ БЕЗ ЛАГОВ) -->
+    <!-- 4. ВИТРИНА РАБОТ (С УМНОЙ ПОДГРУЗКОЙ И ЗАЩИТОЙ) -->
     <section class="showcase-section">
       <div class="showcase-header">
-        <span>// SELECTED_WORKS [04]</span>
+        <span class="showcase-title">// SELECTED_WORKS [04]</span>
         <span>payload.deep // 60fps</span>
       </div>
 
       <div class="showcase-grid">
         <div class="work-card tilt-item">
-          <video 
-            class="lazy-video"
-            src="bg.mp4" 
-            poster="work1.jpg"
-            preload="metadata"
-            loop 
-            muted 
-            playsinline 
-            disablePictureInPicture 
-            controlsList="nodownload nofullscreen noremoteplayback"
-          ></video>
-          <div class="work-hud">
-            <span class="work-tag sound-btn" onclick="toggleSound(this)">🔇 SOUND OFF</span>
-            <span>01 // protocol_zero.mp4</span>
+          <div class="work-media-wrap">
+            <video 
+              class="lazy-video"
+              src="bg.mp4" 
+              poster="work1.jpg"
+              preload="metadata"
+              loop 
+              muted 
+              playsinline 
+              disablePictureInPicture 
+              controlsList="nodownload nofullscreen noremoteplayback"
+            ></video>
+            <div class="work-hud">
+              <span class="work-tag sound-btn" onclick="toggleSound(this)">🔇 SOUND OFF</span>
+              <div class="work-footer-bar">
+                <span>01 // protocol_zero.mp4</span>
+                <span>[3D_MOTION]</span>
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="work-card tilt-item">
-          <video 
-            class="lazy-video"
-            src="sakura.mp4" 
-            preload="metadata"
-            loop 
-            muted 
-            playsinline 
-            disablePictureInPicture 
-            controlsList="nodownload nofullscreen noremoteplayback"
-          ></video>
-          <div class="work-hud">
-            <span class="work-tag sound-btn" onclick="toggleSound(this)">🔇 SOUND OFF</span>
-            <span>02 // impl_moment_hud.mp4</span>
+          <div class="work-media-wrap">
+            <video 
+              class="lazy-video"
+              src="sakura.mp4" 
+              preload="metadata"
+              loop 
+              muted 
+              playsinline 
+              disablePictureInPicture 
+              controlsList="nodownload nofullscreen noremoteplayback"
+            ></video>
+            <div class="work-hud">
+              <span class="work-tag sound-btn" onclick="toggleSound(this)">🔇 SOUND OFF</span>
+              <div class="work-footer-bar">
+                <span>02 // impl_moment_hud.mp4</span>
+                <span>[HUD_TRACK]</span>
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="work-card tilt-item">
-          <img src="work1.jpg" loading="lazy" decoding="async" alt="aezakmi data_stream">
-          <div class="work-hud">
-            <span class="work-tag">STILL // 3D</span>
-            <span>03 // data_stream_vis</span>
+          <div class="work-media-wrap">
+            <img src="work1.jpg" loading="lazy" decoding="async" alt="aezakmi data_stream">
+            <div class="work-hud">
+              <span class="work-tag">STILL // 3D</span>
+              <div class="work-footer-bar">
+                <span>03 // data_stream_vis</span>
+                <span>[RENDER]</span>
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="work-card tilt-item">
-          <img src="work2.jpg" loading="lazy" decoding="async" alt="aezakmi signal.lost">
-          <div class="work-hud">
-            <span class="work-tag">STILL // MACRO</span>
-            <span>04 // signal.lost.relay</span>
+          <div class="work-media-wrap">
+            <img src="work2.jpg" loading="lazy" decoding="async" alt="aezakmi signal.lost">
+            <div class="work-hud">
+              <span class="work-tag">STILL // MACRO</span>
+              <div class="work-footer-bar">
+                <span>04 // signal.lost.relay</span>
+                <span>[SHADER]</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -590,7 +826,7 @@
   </main>
 
   <script>
-    // === 1. ЗАЩИТА КОНТЕНТА ===
+    // === 1. ЖЕСТКАЯ ЗАЩИТА КОНТЕНТА (БЕЗ ИЗМЕНЕНИЙ, КАК ТЫ ПРОСИЛ) ===
     document.addEventListener('contextmenu', e => e.preventDefault());
     document.addEventListener('dragstart', e => e.preventDefault());
     document.addEventListener('keydown', e => {
@@ -603,13 +839,34 @@
       }
     });
 
-    // === 2. КОМФОРТНАЯ ГРОМКОСТЬ (22%) И УМНЫЙ ЗАПУСК ВИДЕО ПРИ СКРОЛЛЕ ===
+    // === 2. ИНТЕРАКТИВНЫЙ КИБЕР-ДЕКОДЕР НА ЗАГОЛОВКЕ AEZAKMI ===
+    const titleEl = document.getElementById('glitchTitle');
+    const glyphPool = 'aezakmi01X#/_+*';
+    let decodeInterval = null;
+
+    titleEl.addEventListener('mouseenter', () => {
+      let step = 0;
+      const original = titleEl.dataset.text;
+      clearInterval(decodeInterval);
+      decodeInterval = setInterval(() => {
+        titleEl.textContent = original
+          .split('')
+          .map((char, idx) => (idx < step ? original[idx] : glyphPool[Math.floor(Math.random() * glyphPool.length)]))
+          .join('');
+        step += 0.45;
+        if (step >= original.length) {
+          titleEl.textContent = original;
+          clearInterval(decodeInterval);
+        }
+      }, 30);
+    });
+
+    // === 3. КОМФОРТНАЯ ГРОМКОСТЬ (22%) И УМНЫЙ ЗАПУСК ВИДЕО ПРИ СКРОЛЛЕ ===
     const DEFAULT_VOLUME = 0.22;
     document.querySelectorAll('video').forEach(vid => {
       vid.volume = DEFAULT_VOLUME;
     });
 
-    // Видео в галерее играют только когда они в кадре — убирает 100% лагов
     const videoObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         const vid = entry.target;
@@ -645,7 +902,7 @@
       btn.classList.toggle('active', !video.muted);
     }
 
-    // === 3. ПЛАВНАЯ И ДЕЛИКАТНАЯ 3D-ФИЗИКА КАРТОЧКИ ===
+    // === 4. ПЛАВНАЯ И ДЕЛИКАТНАЯ 3D-ФИЗИКА КАРТОЧКИ ===
     const card = document.getElementById('liquidCard');
     const glare = document.getElementById('liquidGlare');
     const bgWrapper = document.getElementById('bgWrapper');
@@ -719,7 +976,7 @@
     }
     animatePhysics();
 
-    // === 4. МАГНИТНЫЕ КНОПКИ И НАКЛОН КАРТОЧЕК ===
+    // === 5. МАГНИТНЫЕ КНОПКИ И НАКЛОН КАРТОЧЕК ===
     document.querySelectorAll('.magnetic-btn').forEach(btn => {
       btn.addEventListener('mousemove', (e) => {
         const rect = btn.getBoundingClientRect();
@@ -744,10 +1001,9 @@
       });
     });
 
-    // === 5. СИСТЕМА ПЕЧАТАЮЩИХСЯ ПЛАШЕК ПО СЛОТАМ (НИКОГДА НЕ НАКЛАДЫВАЮТСЯ ДРУГ НА ДРУГА) ===
+    // === 6. СИСТЕМА ПЕЧАТАЮЩИХСЯ ПЛАШЕК ПО СЛОТАМ (БЕЗ НАЛОЖЕНИЙ) ===
     const asciiLayer = document.getElementById('asciiBgLayer');
 
-    // 6 фиксированных зон вокруг центра (3 слева, 3 справа), чтобы плашки не пересекались
     const slots = [
       { id: 0, left: '4%',  top: '14%', depth: 'near', busy: false },
       { id: 1, left: '6%',  top: '44%', depth: 'far',  busy: false },
@@ -784,7 +1040,6 @@ mesh_v4.obj`
     ];
 
     function spawnTypingAscii() {
-      // Ищем только свободные слоты (держим на экране максимум 3 плашки одновременно для минимализма)
       const activeCount = slots.filter(s => s.busy).length;
       if (activeCount >= 3) return;
 
@@ -798,9 +1053,9 @@ mesh_v4.obj`
       node.className = 'ascii-floating-node typing';
 
       const isNear = slot.depth === 'near';
-      const scale = isNear ? 0.96 : 0.76;
-      const opacity = isNear ? 0.78 : 0.38;
-      const blurPx = isNear ? 0.3 : 1.6;
+      const scale = isNear ? 0.96 : 0.78;
+      const opacity = isNear ? 0.85 : 0.42;
+      const blurPx = isNear ? 0.2 : 1.4;
 
       node.style.left = slot.left;
       node.style.top = slot.top;
@@ -824,7 +1079,7 @@ mesh_v4.obj`
             node.style.opacity = '0';
             setTimeout(() => {
               node.remove();
-              slot.busy = false; // Освобождаем слот только после полного исчезновения
+              slot.busy = false;
             }, 950);
           }, 2800 + Math.random() * 1400);
         }
