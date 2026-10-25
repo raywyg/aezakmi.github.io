@@ -90,22 +90,80 @@
       pointer-events: none;
     }
 
-    .hud-orbit-svg {
+    /* === ПРОФЕССИОНАЛЬНЫЙ МНОГОСЛОЙНЫЙ HUD-ПРИЦЕЛ AEZAKMI ПОЗАДИ ПЛАШКИ === */
+    .hud-rig-container {
       position: absolute;
-      top: 50%;
+      top: 44%;
       left: 50%;
-      width: min(860px, 94vw);
-      height: min(860px, 94vw);
-      transform: translate(-50%, -52%);
+      width: min(760px, 95vw);
+      height: min(760px, 95vw);
+      transform: translate3d(-50%, -50%, 0);
       z-index: 2;
-      opacity: 0.28;
       pointer-events: none;
-      animation: slowSpin 90s linear infinite;
+      will-change: transform;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    @keyframes slowSpin {
-      from { transform: translate(-50%, -52%) rotate(0deg); }
-      to { transform: translate(-50%, -52%) rotate(360deg); }
+    .hud-rig-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      /* Двойное свечение: четкая графитовая тень + белый ореол для читаемости на любом участке фона */
+      filter: 
+        drop-shadow(0 0 18px rgba(255, 255, 255, 0.95))
+        drop-shadow(0 6px 24px rgba(9, 11, 16, 0.14));
+      opacity: 0.86;
+    }
+
+    .hud-layer {
+      transform-origin: 400px 400px;
+      will-change: transform;
+    }
+
+    /* Разнонаправленное вращение колец как в After Effects */
+    .hud-layer-outer-arcs {
+      animation: hudSpinCW 46s linear infinite;
+    }
+
+    .hud-layer-gear-ring {
+      animation: hudSpinCCW 64s linear infinite;
+    }
+
+    .hud-layer-telemetry {
+      animation: hudSpinCW 34s linear infinite;
+    }
+
+    .hud-layer-mid-shutter {
+      animation: hudSpinCCW 22s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+    }
+
+    .hud-layer-core-brackets {
+      animation: hudSnapRotate 12s cubic-bezier(0.85, 0, 0.15, 1) infinite;
+    }
+
+    @keyframes hudSpinCW {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes hudSpinCCW {
+      from { transform: rotate(360deg); }
+      to { transform: rotate(0deg); }
+    }
+
+    /* Механический рывковый поворот центрального ядра как на видео трекинга */
+    @keyframes hudSnapRotate {
+      0%   { transform: rotate(0deg) scale(1); }
+      20%  { transform: rotate(90deg) scale(1.03); }
+      25%  { transform: rotate(90deg) scale(1); }
+      45%  { transform: rotate(180deg) scale(1); }
+      50%  { transform: rotate(180deg) scale(0.97); }
+      70%  { transform: rotate(270deg) scale(1); }
+      75%  { transform: rotate(270deg) scale(1.02); }
+      95%  { transform: rotate(360deg) scale(1); }
+      100% { transform: rotate(360deg) scale(1); }
     }
 
     /* === 2. ПЕЧАТАЮЩИЕСЯ ТЕРМИНАЛЬНЫЕ ПЛАШКИ === */
@@ -155,7 +213,7 @@
     .cyber-grid {
       position: absolute;
       inset: 0;
-      z-index: 2;
+      z-index: 1;
       background-image: 
         linear-gradient(rgba(9, 11, 16, 0.035) 1px, transparent 1px),
         linear-gradient(90deg, rgba(9, 11, 16, 0.035) 1px, transparent 1px);
@@ -256,11 +314,11 @@
       border-radius: 28px;
       background: linear-gradient(
         145deg,
-        rgba(255, 255, 255, 0.84) 0%,
-        rgba(245, 247, 252, 0.64) 100%
+        rgba(255, 255, 255, 0.80) 0%,
+        rgba(245, 247, 252, 0.58) 100%
       );
-      backdrop-filter: blur(24px) saturate(180%);
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
       border: 1px solid rgba(9, 11, 16, 0.1);
       box-shadow:
         0 28px 60px rgba(9, 11, 16, 0.08),
@@ -618,11 +676,13 @@
       .hud-bar { left: 14px; right: 14px; top: 12px; }
       .liquid-glass-card { padding: 34px 20px 26px; border-radius: 22px; }
       .ascii-floating-node { font-size: 9px; padding: 5px 8px; }
+      .hud-rig-container { top: 38%; width: 98vw; height: 98vw; }
     }
   </style>
 </head>
 <body>
 
+  <!-- 1. СВЕТЛАЯ ГОЛОГРАФИЧЕСКАЯ СЦЕНА ФОНА -->
   <div class="viewport-bg">
     <div class="bg-wrapper" id="bgWrapper">
       <video 
@@ -640,20 +700,106 @@
     </div>
 
     <div class="bg-overlay"></div>
-
-    <svg class="hud-orbit-svg" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="300" cy="300" r="240" stroke="#090b10" stroke-width="1" stroke-dasharray="6 8" />
-      <circle cx="300" cy="300" r="175" stroke="#0033ff" stroke-width="0.75" stroke-Opacity="0.5" />
-      <circle cx="300" cy="60" r="4" fill="#090b10" />
-      <circle cx="475" cy="300" r="3.5" fill="#0033ff" />
-      <line x1="300" y1="20" x2="300" y2="50" stroke="#090b10" stroke-width="1"/>
-      <line x1="300" y1="550" x2="300" y2="580" stroke="#090b10" stroke-width="1"/>
-    </svg>
-
     <div class="cyber-grid"></div>
+
+    <!-- ТОЧНАЯ КОПИЯ МОУШН-КРУГОВ AEZAKMI С РАЗНОНАПРАВЛЕННЫМ ВРАЩЕНИЕМ -->
+    <div class="hud-rig-container" id="hudRig">
+      <svg class="hud-rig-svg" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+        
+        <!-- СЛОЙ 1: Внешние разомкнутые дуги + массивный сектор-индикатор слева сверху -->
+        <g class="hud-layer hud-layer-outer-arcs">
+          <!-- Длинная правая и нижняя дуга (радиус 348) -->
+          <circle cx="400" cy="400" r="348" stroke="#090b10" stroke-width="6.5" stroke-opacity="0.72"
+                  stroke-dasharray="480 280 420 1005" stroke-dashoffset="40" />
+          <!-- Массивный прямоугольный блок-сектор на внешнем кольце слева сверху -->
+          <circle cx="400" cy="400" r="334" stroke="#090b10" stroke-width="26" stroke-opacity="0.88"
+                  stroke-dasharray="145 2000" stroke-dashoffset="-960" />
+          <!-- Тонкая дублирующая дуга -->
+          <circle cx="400" cy="400" r="362" stroke="#0033ff" stroke-width="1.5" stroke-opacity="0.45"
+                  stroke-dasharray="180 600 90 1400" />
+        </g>
+
+        <!-- СЛОЙ 2: Зубчатое кольцо-шестеренка с мелкими делениями и 8 крупными засечками -->
+        <g class="hud-layer hud-layer-gear-ring">
+          <!-- Базовая тонкая линия под зубцами -->
+          <circle cx="400" cy="400" r="306" stroke="#090b10" stroke-width="2.5" stroke-opacity="0.65" />
+          <!-- Мелкие частые зубчики по всему периметру -->
+          <circle cx="400" cy="400" r="306" stroke="#090b10" stroke-width="7.5" stroke-opacity="0.78"
+                  stroke-dasharray="3.5 9.9" />
+          <!-- Крупные выступающие квадратные маркеры через каждые 45 градусов -->
+          <circle cx="400" cy="400" r="312" stroke="#090b10" stroke-width="11" stroke-opacity="0.9"
+                  stroke-dasharray="7 238" />
+        </g>
+
+        <!-- СЛОЙ 3: Кольцо телеметрии с треугольными поинтерами, двойными рисками и 4 осевыми линиями -->
+        <g class="hud-layer hud-layer-telemetry">
+          <!-- Основная орбита телеметрии -->
+          <circle cx="400" cy="400" r="244" stroke="#090b10" stroke-width="3" stroke-opacity="0.75" />
+          <!-- Боковая дуга-скоба слева снизу -->
+          <circle cx="400" cy="400" r="262" stroke="#090b10" stroke-width="5.5" stroke-opacity="0.8"
+                  stroke-dasharray="130 1550" stroke-dashoffset="-620" />
+          
+          <!-- 4 длинные внутренние осевые засечки (верх, низ, лево, право) -->
+          <line x1="400" y1="168" x2="400" y2="206" stroke="#090b10" stroke-width="5.5" stroke-opacity="0.82" />
+          <line x1="400" y1="594" x2="400" y2="632" stroke="#090b10" stroke-width="5.5" stroke-opacity="0.82" />
+          <line x1="168" y1="400" x2="206" y2="400" stroke="#090b10" stroke-width="5.5" stroke-opacity="0.82" />
+          <line x1="594" y1="400" x2="632" y2="400" stroke="#090b10" stroke-width="5.5" stroke-opacity="0.82" />
+
+          <!-- Двойные диагональные штрихи (" ") как на референсе -->
+          <g transform="rotate(45 400 400)">
+            <line x1="394" y1="176" x2="394" y2="190" stroke="#090b10" stroke-width="4.5" stroke-opacity="0.75" />
+            <line x1="406" y1="176" x2="406" y2="190" stroke="#090b10" stroke-width="4.5" stroke-opacity="0.75" />
+            <line x1="394" y1="610" x2="394" y2="624" stroke="#090b10" stroke-width="4.5" stroke-opacity="0.75" />
+            <line x1="406" y1="610" x2="406" y2="624" stroke="#090b10" stroke-width="4.5" stroke-opacity="0.75" />
+          </g>
+          <g transform="rotate(-45 400 400)">
+            <line x1="394" y1="176" x2="394" y2="190" stroke="#090b10" stroke-width="4.5" stroke-opacity="0.75" />
+            <line x1="406" y1="176" x2="406" y2="190" stroke="#090b10" stroke-width="4.5" stroke-opacity="0.75" />
+            <line x1="394" y1="610" x2="394" y2="624" stroke="#090b10" stroke-width="4.5" stroke-opacity="0.75" />
+            <line x1="406" y1="610" x2="406" y2="624" stroke="#090b10" stroke-width="4.5" stroke-opacity="0.75" />
+          </g>
+
+          <!-- Треугольные маркеры на орбите -->
+          <polygon points="400,152 390,136 410,136" fill="#090b10" fill-opacity="0.85" transform="rotate(8 400 400)" />
+          <polygon points="400,152 391,138 409,138" fill="#090b10" fill-opacity="0.85" transform="rotate(-128 400 400)" />
+          <polygon points="400,160 392,174 408,174" fill="#0033ff" fill-opacity="0.85" transform="rotate(205 400 400)" />
+
+          <!-- Узелки-точки на кольце -->
+          <circle cx="400" cy="156" r="5" fill="#090b10" transform="rotate(-22 400 400)" />
+          <circle cx="400" cy="156" r="5" fill="#090b10" transform="rotate(64 400 400)" />
+          <circle cx="400" cy="156" r="5" fill="#090b10" transform="rotate(148 400 400)" />
+          <circle cx="400" cy="156" r="5" fill="#090b10" transform="rotate(-95 400 400)" />
+        </g>
+
+        <!-- СЛОЙ 4: Среднее кольцо + парные полукруглые дуги затвора -->
+        <g class="hud-layer hud-layer-mid-shutter">
+          <circle cx="400" cy="400" r="176" stroke="#090b10" stroke-width="3.5" stroke-opacity="0.75" />
+          <!-- Две средние изогнутые полосы внутри кольца -->
+          <circle cx="400" cy="400" r="134" stroke="#090b10" stroke-width="12" stroke-opacity="0.82"
+                  stroke-dasharray="210 211" stroke-dashoffset="35" />
+          <!-- Малый треугольный прицел внутри среднего кольца -->
+          <polygon points="220,400 206,392 206,408" fill="#090b10" fill-opacity="0.85" transform="rotate(15 400 400)" />
+        </g>
+
+        <!-- СЛОЙ 5: Центральное ядро с массивными скобами объектива -->
+        <g class="hud-layer hud-layer-core-brackets">
+          <!-- Две толстые скобы вокруг центра -->
+          <circle cx="400" cy="400" r="84" stroke="#090b10" stroke-width="22" stroke-opacity="0.9"
+                  stroke-dasharray="155 109" stroke-dashoffset="78" />
+          <!-- Внутреннее тонкое ядро -->
+          <circle cx="400" cy="400" r="64" stroke="#090b10" stroke-width="3.5" stroke-opacity="0.85" />
+          <!-- Кислотно-зеленый микро-акцент внутри ядра -->
+          <circle cx="400" cy="400" r="64" stroke="#8be800" stroke-width="3.5"
+                  stroke-dasharray="45 400" stroke-dashoffset="-20" />
+        </g>
+
+      </svg>
+    </div>
+
     <div class="ascii-bg-layer" id="asciiBgLayer"></div>
   </div>
 
+  <!-- 2. ВЕРХНИЙ ТЕХНИЧЕСКИЙ HUD -->
   <header class="hud-bar">
     <div class="hud-coord">
       <b>SYS_01</b>
@@ -665,6 +811,7 @@
     </div>
   </header>
 
+  <!-- 3. ГЛАВНАЯ СЦЕНА -->
   <main>
     <div class="liquid-card-scene">
       <div class="liquid-glass-card" id="liquidCard">
@@ -887,10 +1034,11 @@
       btn.classList.toggle('active', !video.muted);
     }
 
-    // === 4. ПЛАВНАЯ И ДЕЛИКАТНАЯ 3D-ФИЗИКА КАРТОЧКИ ===
+    // === 4. ПЛАВНАЯ И ДЕЛИКАТНАЯ 3D-ФИЗИКА КАРТОЧКИ + ПАРАЛЛАКС МОУШН-КРУГОВ ===
     const card = document.getElementById('liquidCard');
     const glare = document.getElementById('liquidGlare');
     const bgWrapper = document.getElementById('bgWrapper');
+    const hudRig = document.getElementById('hudRig');
 
     let state = {
       rotX: 0, rotY: 0, targetRotX: 0, targetRotY: 0,
@@ -914,6 +1062,8 @@
       glare.style.setProperty('--glare-y', `${glareY}%`);
 
       bgWrapper.style.transform = `translate3d(${-normX * 14}px, ${-normY * 14}px, 0)`;
+      // Параллакс HUD-прицела позади карточки для глубокого 3D-объема
+      hudRig.style.transform = `translate3d(calc(-50% + ${normX * 26}px), calc(-50% + ${normY * 26}px), 0)`;
 
       if (state.isDragging) {
         const rawDx = (e.clientX - state.startX) * 0.16;
